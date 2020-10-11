@@ -1,0 +1,63 @@
+const userDomain = {}
+
+userDomain.findUser = async(auth, login_index) => {
+    try{
+        const response = await auth.query(`
+            SELECT index, username, password,role 
+            FROM login
+            WHERE index = ${login_index}
+        `);
+        return response.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+userDomain.selectUser = async(auth, username) => {
+    try{
+        const response = await auth.query(`
+            SELECT index, username, password,role 
+            FROM login
+            WHERE username = '${username}'
+        `);
+        return response.rows;
+    }catch(err){    
+        throw err;
+    }
+}
+
+userDomain.insertUser = async(auth, payload) => {
+    try{
+        const response = await auth.query(`
+            INSERT INTO "login" (username, password, role)
+            VALUES ('${payload.username}', '${payload.password}', '${payload.role}') RETURNING *
+        `);
+        return response.rows[0].index;
+    }catch(err){
+        throw err;
+    }
+}
+
+userDomain.insertTokenRefreshTable = async(auth, login_index) => {
+    try{
+        await auth.query(`
+            INSERT INTO "tokens_refresh" (login_index, refresh_token)
+            VALUES (${login_index}, null)
+        `);
+    }catch(err){
+        throw err;
+    }
+}
+
+userDomain.insertTokenAccessTable = async(auth, login_index) => {
+    try{
+        await auth.query(`
+            INSERT INTO "tokens_access" (login_index, access_token)
+            VALUES (${login_index}, null)
+        `);
+    }catch(err){
+        throw err;
+    }
+}
+
+export default userDomain;
