@@ -5,7 +5,7 @@ authDomain.fetchUser = async(auth, username) => {
         const info = `
             SELECT index, username, password, role
             FROM "login"
-            WHERE username = '${username}'
+            WHERE username ILIKE '%${username}%'
         `
         const response = await auth.query(info);
         return response.rows;

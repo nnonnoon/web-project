@@ -54,9 +54,13 @@ authController.login = async(req, res, next) => {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 });
+            }else{
+                res.status(400).json({
+                    message: "wrong password"
+                });
             }
         }else{
-            res.status(500).json({
+            res.status(400).json({
                 message: "User not found!!"
             });
         }

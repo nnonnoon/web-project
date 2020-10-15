@@ -16,7 +16,7 @@ passport.use(
     new JwtStrategy(option, async(jwtPayload, done) => {
         const auth = await pool.connect();
         try{
-            const { login_index, username} = jwtPayload;
+            const { login_index, username } = jwtPayload;
             const findUser = await userDomain.findUser(auth, login_index);
 
             if(findUser.length > 0 && username == findUser[0].username){
