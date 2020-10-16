@@ -4,9 +4,7 @@ import './App.css';
 
 function App() {
   return (
-    <Login>
-      hello
-    </Login>
+      <Login/>
   );
 }
 
