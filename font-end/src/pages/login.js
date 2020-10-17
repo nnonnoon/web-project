@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
 import login_pic from '../assets/icon/login.png'
-import { Form, Button, Input } from "antd";
+import { Form, Button, Input, message } from "antd";
 import { authentication } from "../services/api"
+import { subDomain } from "../services/redirect"
 
 const Mainbox = styled.div`
   box-sizing: border-box;
@@ -28,11 +29,11 @@ const Box = styled.div`
 
 const Flexbox = styled.div`
   width: 100%;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 4rem;
+  padding: 0rem 4rem;
+  justify-content: center;
 `;
 
 const FormAll = styled(Form)`
@@ -40,9 +41,8 @@ const FormAll = styled(Form)`
     display: flex;
     flex-direction: column;
     align-items: center; 
-    position: relative;
-    &.ant-form-horizontal{
-        width: 0%
+    &.ant-form label {
+        font-weight: 500;
     }
 `
 
@@ -50,89 +50,35 @@ const Text = styled.div`
     font-family: "Roboto";
 `;
 
-// const StylesTextField = styled(TextField)`
-//     &&{
-//         width: 100%;
-//         margin-top: 2rem;
-//         color: white;
-//     }
-//     & .MuiInput-underline::before{
-//         height: 0.5rem;
-//         border-bottom-color: white;
-//     }
-//     & .MuiInputLabel-formControl{
-//         color: #fff;
-//     }
-// `
-
-// const StyledButton = styled(Button)`
-//     &&{
-//         background-color: #00B0FF;
-//         color: #fff;
-//         padding: 7px 14px;
-//         width: 40%;
-//         font-family: "Roboto";
-//         font-size: 1.25rem;
-//         margin-top: 3rem;
-//         box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-//     }
-//     &:hover {
-//         background-color: white;
-//     }
-// `;
-
 const Formitem = styled(Form.Item)`
     display: flex;
     border-radius: 1rem;
     align-items: center; 
     justify-content: center;
     margin-top: 1rem;
-    .ant-input{
-        width: 21.5rem;
-        height: 1rem;
-        border-color: white;
-    }
+    width: 100%;
 `;
 const StyledButton = styled(Button)`
     color: #fff;
-    padding: 7px 14px;
-    width: 10rem;
+    height: 100%;
+    width: 40%;
     font-family: "Roboto";
-    font-size: 1.25rem;
-    margin-top: 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 1rem;
     border-radius: 1rem;
     background: #00B0FF;
     border-color: #00B0FF;
     cursor: pointer;
-    .ant-click-animating-without-extra-node {
-        border: none !important;
-    }
 `;
 
-
-// const initialValues = {
-//     username: '',
-//     password: ''
-// }
-
 class Login extends Component {
-// export default function Login(){
-
-    // const [values, setValues] = useState(initialValues);
-
-    // const handleInputChange = e => {
-    //     const {name, value} = e.target;
-    //     setValues({
-    //         ...values,
-    //         [name]:value
-    //     })
-    // }
-
     constructor(props){
         super(props);
         this.state ={
             username: "",
             password: "",
+            incorrect: false
         }
         this.handleLogin = this.handleLogin.bind(this);
     }
@@ -148,13 +94,38 @@ class Login extends Component {
             payload,
             ({ data }) => {
                 console.log(data);
+                localStorage.setItem("access-token", data.accessToken);
+                localStorage.setItem("refresh-token", data.refreshToken);
+                this.confirmLogin();
+            },
+            (response) => {
+                console.log(response.data.message);
+                if (response && response.status === 400) {
+                    this.setState({
+                        incorrect: true,
+                    });
+                    message.error("Login failed");
+                  }
             }
         );
     } 
 
     onFinish = (values) => {
+        console.log(values)
         this.setState(values);
         this.handleLogin();
+    }
+
+    confirmLogin() {
+        message.success("Login successful");
+        let secondsToGo = 1;
+        const timer = setInterval(() => {
+          secondsToGo -= 1
+        }, 1000);
+        setTimeout(() => {
+          clearInterval(timer);
+          window.location = `${subDomain}/competition`
+        }, secondsToGo * 1000);
     }
 
     render() {
@@ -163,17 +134,15 @@ class Login extends Component {
                 <Box>
                     <Flexbox>
                         <Text style={{ color: '#FFFFFF', fontSize: '5.5rem', fontWeight: 'bold', fontStyle: 'italic'}}>Running</Text>
-                        <img src={login_pic} alt={login_pic} style={{width: '10.625rem', height: '10rem', marginTop: '1rem'}} ></img>
+                        <img src={login_pic} alt={login_pic} style={{width: '10.625rem', height: '10rem', marginTop: '0.2rem'}} ></img>
                         <Text style={{ color: 'black', fontSize: '1.5rem', fontWeight: 'bold', marginTop: '1rem', marginBottom: '1rem'}}>WELCOME</Text>
-                        <FormAll  onFinish={this.onFinish}>
-                        {/* <StylesTextField InputProps={{style: {color: "black"}}} label="username" name="username" value={values.username} onChange={handleInputChange}/>
-                        <StylesTextField InputProps={{style: {color: "black"}}} label="password" name="password" value={values.password} onChange={handleInputChange}/> */}
-                            <Text style={{ color: '#FFFFFF', fontSize: '1rem', fontWeight: 'bold', marginLeft: '-18rem', marginBottom: '-0.5rem'}}>username</Text>
+                        <FormAll layout="vertical" onFinish={this.onFinish}>
+                            <Text style={{ color: '#FFFFFF', fontSize: '1rem', fontWeight: 'bold', marginLeft: '-17.5rem', marginBottom: '-0.5rem'}}>username</Text>
                             <Formitem  name="username">
-                                <Input/>
+                                <Input />
                             </Formitem>
-                            <Text style={{ color: '#FFFFFF', fontSize: '1rem', fontWeight: 'bold', marginLeft: '-18rem', marginBottom: '-0.5rem', marginTop: '1rem'}}>password</Text>
-                            <Formitem name="password" >
+                            <Text style={{ color: '#FFFFFF', fontSize: '1rem', fontWeight: 'bold', marginLeft: '-17.5rem', marginBottom: '-0.5rem'}}>password</Text>
+                            <Formitem name="password" style={{ marginBottom: '0' }}>
                                 <Input.Password />
                             </Formitem>
                             <Formitem>
