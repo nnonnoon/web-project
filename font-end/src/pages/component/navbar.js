@@ -4,21 +4,13 @@ import MediaQuery from "react-responsive";
 import { redirectTo } from "../../services/redirect";
 import { message, Button } from "antd";
 
-const ContainerLayout = styled.div`
-  max-width: 136.6rem;
-  width: 82%;
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
 const Bar = styled.div`
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 176, 255, 0.52);
-    height: 7%;
+    background: rgba(163, 213, 252);
+    height: 3.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -83,18 +75,16 @@ class navbar extends Component {
 
     render() {
         return (
-           <ContainerLayout>
-                <Bar>
-                    <MediaQuery minDeviceWidth={680}>
-                        <List>
-                            <Text onClick= {this.handleRefresh}>Running</Text>
-                        </List>
-                        <List>
-                            <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
-                        </List>
-                    </MediaQuery>
-                </Bar>
-           </ContainerLayout>
+            <Bar>
+                <MediaQuery minDeviceWidth={680}>
+                    <List>
+                        <Text onClick= {this.handleRefresh}>Running</Text>
+                    </List>
+                    <List>
+                        <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
+                    </List>
+                </MediaQuery>
+            </Bar>
         );
     }
 }
