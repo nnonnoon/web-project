@@ -7,6 +7,14 @@ const commonApi = axios.create({
     },
 });
 
+const managerApi = axios.create({
+    baseURL: 'http://localhost:3001/api/manager',
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+    },
+});
+
 export const authentication = {
     Login: (payload, callback, onRejected) => 
         commonApi
@@ -14,3 +22,16 @@ export const authentication = {
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response))
 };
+
+export const manager = {
+    addCompetition: (payload, callback, onRejected) => 
+        managerApi
+            .post("/addCompetition", payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    fetchAllCompetition: (callback, onRejected) => 
+        managerApi
+            .get("/fetchAllCompetition")
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response))
+}
