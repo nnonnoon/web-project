@@ -23,7 +23,7 @@ authController.login = async(req, res, next) => {
             const username = info[0].username;
             const checkPassword = compareSync(password, info[0].password);
             const role = info[0].role;
-
+            
             if(checkPassword){
                 const accessToken = jwt.sign(
                     {

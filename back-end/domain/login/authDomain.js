@@ -3,7 +3,7 @@ const authDomain = {}
 authDomain.fetchUser = async(auth, username) => {
     try{
         const info = `
-            SELECT index, username, password, role
+            SELECT index, username, password, role, name_title, first_name, last_name, gender
             FROM "login"
             WHERE username ILIKE '%${username}%'
         `

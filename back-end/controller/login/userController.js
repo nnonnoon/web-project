@@ -33,7 +33,7 @@ userController.fetchAllUser = async(req, res, next) => {
 }
 
 userController.addUser = async(req, res, next) => {
-    var { username } = req.body;
+    var { username, name_title, first_name, last_name, gender } = req.body;
     const { role } = req.user
     const auth = await pool.connect();
 
@@ -64,12 +64,14 @@ userController.addUser = async(req, res, next) => {
                 payload["username"] = username;
                 payload["password"] = hashSync(genPassword, salt);
                 payload["role"] = req.body.role.toLowerCase();
-
+                payload["name_tiltle"] = name_title;
+                payload["first_name"] = first_name;
+                payload["last_name"] = last_name;
+                payload["gender"] = gender;
 
                 const login_index = await userDomain.insertUser(auth, payload);
                 await userDomain.insertTokenAccessTable(auth, login_index);
                 await userDomain.insertTokenRefreshTable(auth, login_index);
-
 
                 res.status(200).json({
                     username: username,

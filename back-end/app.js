@@ -17,7 +17,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.use(passport.initialize());
 
 app.use(express.json());
