@@ -3,6 +3,7 @@ import styled from "styled-components";
 import MediaQuery from "react-responsive";
 import { redirectTo } from "../../services/redirect";
 import { message, Button } from "antd";
+import { subDomain } from '../../services/redirect'
 
 const Bar = styled.div`
     position: fixed;
@@ -61,15 +62,15 @@ class navbar extends Component {
         let secondsToGo = 1;
         const timer = setInterval(() => {
             secondsToGo -= 1;
-          }, 1000);
+          }, 500);
           setTimeout(() => {
             clearInterval(timer);
             redirectTo(`/login`);
-        }, secondsToGo * 1000);
+        }, secondsToGo * 500);
     }
 
     handleRefresh() {
-        window.location.reload();
+        window.location = `${subDomain}/competition`
     }
 
 

@@ -36,4 +36,13 @@ managerDomain.fetchAllCompetition = async(manager) => {
     }
 }
 
+managerDomain.deleteCompetition = async(manager, competition_index) => {
+    try{
+        await manager.query(`DELETE FROM "competition" WHERE index = ${competition_index}`);
+
+    }catch(err){
+        throw err;
+    }
+}
+
 export default managerDomain;

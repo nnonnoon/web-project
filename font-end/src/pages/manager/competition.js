@@ -6,6 +6,8 @@ import { Button, Modal, Form, Input, Dropdown, Menu, DatePicker, message } from 
 import { DownOutlined } from '@ant-design/icons';
 import { manager } from '../../services/api'
 import trashIcon from '../../assets/icon/bin.svg';
+import trash_comfirm from '../../assets/icon/trash_comfirm.svg'
+import { subDomain } from '../../services/redirect'
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -86,7 +88,8 @@ const ContainerSubmit = styled.div`
     display:flex;
     justify-content: center;
     width: 100%;
-    margin-top: 2rem;
+    margin-top: ${props => props.del ? "1rem":"2rem"};
+    margin-bottom: ${props => props.del ? "0.5rem":""};
 `
 
 const ContainerTable = styled.div`
@@ -100,10 +103,21 @@ const HeaderText = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width:  ${props => props.small? "10%": props.big? "25%": "20%"};;
+    width:  ${props => props.small? "12%": props.big? "30%":  props.del? "10%": "20%"};;
     font-size: ${props => props.header? "16px": "14px"};
     font-weight: ${props => props.header? "bold": ""};
     border-bottom: ${props => props.item? "3px solid #E6E6E6": null}; 
+    cursor: ${props => props.del? "pointer": ""};
+    :hover{
+        background: ${props => props.del? "#FFB5B5": ""};
+    }
+`
+
+const ContainerAllItems = styled.div`
+    display: flex;
+    :hover{
+        background: #F0F0F0;
+    }
 `
 
 const ContainerItems = styled.div`
@@ -116,7 +130,14 @@ const ContainerItems = styled.div`
 const CompetitionStyled = styled.div`
     display: flex;
     height: 3rem;
+    width: 90%;
     cursor: pointer;
+`
+const ContainerPicture = styled.div`
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
 `
 
 
@@ -132,8 +153,11 @@ class competition extends Component {
             date: "",
             visible: false,
             loading: false,
-            competition: []
+            competition: [],
+            visibleDel: false,
+            competition_index: ""
         }
+        this.handleDel = this.handleDel.bind(this);
     }
 
     handleCompetition(){
@@ -218,8 +242,40 @@ class competition extends Component {
         });
     }
 
-    handleDelete(){
-        message.success("Delete");
+    showModalDel = (competition_index) => {
+        console.log(competition_index)
+        this.setState({
+            visibleDel: true,
+            competition_index: competition_index
+        });
+    }
+
+    handleCancelDel= () => {
+        this.setState({ 
+            visibleDel: false 
+        });
+    }
+
+    handleDel(){
+        let competition_index = this.state.competition_index
+        manager.deleteCompetition(
+            competition_index ,
+            ({ data }) => {
+                console.log(data);
+                this.setState({ 
+                    visibleDel: false 
+                });
+                message.success("Delete competition success");
+                this.fetchAllCompetition();
+            },
+            (response) => {
+                console.log(response.data.message);
+            }
+        );
+    }
+
+    handleLinkPage = (competition_index) => {
+        window.location = `${subDomain}/competition/index=${competition_index}`
     }
       
     render() {
@@ -285,6 +341,30 @@ class competition extends Component {
                             </ContainerSubmit>
                         </FormAll>
                 </StyledModal>
+                <StyledModal
+                    visible={this.state.visibleDel}
+                    onCancel={this.handleCancelDel}
+                    title={null}
+                    footer= {null}
+                >
+                    <ContainerPicture>
+                        <img src={trash_comfirm} alt={trash_comfirm}/>
+                    </ContainerPicture>
+                    <Text caption >Confirm to delete ?</Text>
+                    <ContainerSubmit del>
+                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancelDel}>
+                                Cancle
+                        </Button>
+                        <LitleSpace/>
+                        <Button 
+                            key="submit"  htmlType="submit"  
+                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                            onClick={this.handleDel}
+                        >
+                            Submit
+                        </Button>
+                    </ContainerSubmit>
+                </StyledModal>
                 <MediaQuery minDeviceWidth={680}>
                     <ContainerOption>
                         <ContainerHeader>
@@ -306,21 +386,24 @@ class competition extends Component {
                         {
                             this.state.competition.map((competition, index) => {
                                 return(
-                                    <CompetitionStyled key={index+1} >
-                                        <HeaderText  small item>{competition.index}</HeaderText>
-                                        <HeaderText big item>{competition.competition_name}</HeaderText>
-                                        <HeaderText item>{competition.location}</HeaderText>
-                                        <HeaderText item>{competition.date}</HeaderText>
-                                        <HeaderText item >
-                                            {competition.manager_name_title}
-                                            {competition.manager_first_name}
-                                            <LitleSpace spaceName/>
-                                            {competition.manager_last_name}
-                                        </HeaderText>
-                                        <HeaderText small item onClick={this.handleDelete}>
+                                   <ContainerAllItems>
+                                        <CompetitionStyled key={index+1} onClick={() => this.handleLinkPage(competition.index)}>
+                                            <HeaderText  small item>{index+1}</HeaderText>
+                                            <HeaderText big item>{competition.competition_name}</HeaderText>
+                                            <HeaderText item>{competition.location}</HeaderText>
+                                            <HeaderText item>{competition.date}</HeaderText>
+                                            <HeaderText item >
+                                                {competition.manager_name_title}
+                                                {competition.manager_first_name}
+                                                <LitleSpace spaceName/>
+                                                {competition.manager_last_name}
+                                            </HeaderText>
+                                        </CompetitionStyled>
+                                        <HeaderText del item 
+                                            onClick={() => this.showModalDel(competition.index)} >
                                             <img src={trashIcon} alt={trashIcon}></img>
                                         </HeaderText>
-                                    </CompetitionStyled>
+                                   </ContainerAllItems>
                                 )
                             })
                         }

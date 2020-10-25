@@ -33,5 +33,10 @@ export const manager = {
         managerApi
             .get("/fetchAllCompetition")
             .then(({ data }) => callback({ data }))
-            .catch(({ response }) => onRejected(response))
+            .catch(({ response }) => onRejected(response)),
+    deleteCompetition: (cpmpetition_index, callback, onRejected) =>
+        managerApi
+            .delete(`/deleteCompetition/${cpmpetition_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
 }

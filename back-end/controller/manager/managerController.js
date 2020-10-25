@@ -1,3 +1,4 @@
+import { response } from 'express';
 import pool from '../../database/database'
 import managerDomain from '../../domain/manager/managerDomain'
 
@@ -63,6 +64,27 @@ managerController.fetchAllCompetition = async(req, res, next) => {
         console.log(err);
         res.status(500).json({
             message: "Add competition error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.deleteCompetition = async(req, res, next) => {
+    const { competition_index } = req.params;
+    const manager = await pool.connect();
+
+    try{
+        await manager.query("BEGIN");
+        await managerDomain.deleteCompetition(manager, competition_index);
+        res.status(200).json({
+            message: "Delete compettion success"
+        });
+        await manager.query("COMMIT");
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message: "Delete competition error"
         });
     }finally{
         await manager.release();

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import { subDomain, redirectTo } from './services/redirect';
 import Login from './pages/login';
 import Competition from './pages/manager/competition';
+import User from './pages/manager/user'
 import './App.css';
 
 const signedIn = localStorage.getItem("access-token") && localStorage.getItem("refresh-token");
@@ -36,6 +37,11 @@ function App() {
                   issignedIn={signedIn}
                   exact path={`${subDomain}/competition`}
                   component={Competition}
+                />
+                <Privateroute
+                  issignedIn={signedIn}
+                  exact path={`${subDomain}/competition/index=:competition_index`}
+                  component={User}
                 />
               </Switch>
         </div>
