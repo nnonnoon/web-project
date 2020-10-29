@@ -34,9 +34,37 @@ export const manager = {
             .get("/fetchAllCompetition")
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
-    deleteCompetition: (cpmpetition_index, callback, onRejected) =>
+    deleteCompetition: (competition_index, callback, onRejected) =>
         managerApi
-            .delete(`/deleteCompetition/${cpmpetition_index}`)
+            .delete(`/deleteCompetition/${competition_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+
+
+
+    addUser: (payload, callback, onRejected) => 
+        managerApi
+            .post("/addUser", payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    fetchAllUser: (competition_index, callback, onRejected) => 
+        managerApi
+            .get(`/fetchAllUser/${competition_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    fetchUser: (user_index, callback, onRejected) => 
+        managerApi
+            .get(`/fetchUser/${user_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    deleteUser:  (user_index, callback, onRejected) =>
+        managerApi
+            .delete(`/deleteUser/${user_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    updateUser: (user_index, payload, callback, onRejected) =>
+        managerApi
+            .patch(`/updateUser/${user_index}`, payload)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
 }

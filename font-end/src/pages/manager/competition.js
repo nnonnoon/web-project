@@ -103,7 +103,7 @@ const HeaderText = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width:  ${props => props.small? "12%": props.big? "30%":  props.del? "10%": "20%"};;
+    width:  ${props => props.small? "15%": props.big? "25%":  props.del? "10%": props.location? "30%"  : props.time? "%":"18%"};;
     font-size: ${props => props.header? "16px": "14px"};
     font-weight: ${props => props.header? "bold": ""};
     border-bottom: ${props => props.item? "3px solid #E6E6E6": null}; 
@@ -140,7 +140,6 @@ const ContainerPicture = styled.div`
     margin-bottom: 1rem;
 `
 
-
 class competition extends Component {
     formRef = React.createRef();
 
@@ -151,6 +150,8 @@ class competition extends Component {
             competitionName: "",
             location: "Insee Chantarasatit Stadium",
             date: "",
+            timeStart: "",
+            timeEnd: "",
             visible: false,
             loading: false,
             competition: [],
@@ -168,8 +169,12 @@ class competition extends Component {
             index: data.login_index,
             competition_name: this.state.competitionName,
             location: this.state.location,
-            date: this.state.date
+            date: this.state.date,
+            time_start: this.state.timeStart,
+            time_end: this.state.timeEnd,
         };
+
+        console.log(payload)
 
         manager.addCompetition(
             payload,
@@ -227,6 +232,7 @@ class competition extends Component {
 
     onFinish = (values) => {
        this.setState(values);
+       this.formRef.current.resetFields();
        this.handleCompetition();
     }
 
@@ -301,7 +307,7 @@ class competition extends Component {
                     footer= {null}
                 >
                         <Text caption >Competition</Text>
-                        <FormAll onFinish={this.onFinish} autoComplete="off"  >
+                        <FormAll onFinish={this.onFinish} autoComplete="off"  ref={this.formRef}>
                             <Text>Competition Name</Text>
                             <Form.Item name="competitionName">
                                 <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
@@ -320,7 +326,16 @@ class competition extends Component {
                                     style={{width:'100%', cursor: 'pointer', borderRadius:'2rem', height: '2.5rem'}} 
                                     onChange={this.onChange}
                                     format={dateFormat}
-                                    /></Form.Item>
+                                    />
+                                </Form.Item>
+                            <Text  style={{ marginTop: '15px'}}>Time-start</Text>
+                            <Form.Item name= "timeStart"> 
+                                <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                            </Form.Item>
+                            <Text  style={{ marginTop: '15px'}}>Time-end</Text>
+                            <Form.Item  name= "timeEnd"> 
+                                <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                            </Form.Item> 
                             <ContainerSubmit>
                                 <Form.Item>
                                     <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancel}>
@@ -376,11 +391,12 @@ class competition extends Component {
                     </ContainerOption>
                     <ContainerTable>
                         <HeaderText  header small>No.</HeaderText>
-                        <HeaderText  header big>Competition name</HeaderText>
-                        <HeaderText  header>Location</HeaderText>
-                        <HeaderText  header>Date</HeaderText>
-                        <HeaderText  header >Manager</HeaderText>
-                        <HeaderText  header small>Delete</HeaderText>
+                        <HeaderText  header location style={{paddingLeft: "20px"}}>Competition name</HeaderText>
+                        <HeaderText  header big style={{paddingLeft: "18px"}}>Location</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "27px"}}>Date</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "28px"}}>Time</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "50px"}}>Manager</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "20px"}}>Delete</HeaderText>
                     </ContainerTable>
                     <ContainerItems>
                         {
@@ -388,10 +404,11 @@ class competition extends Component {
                                 return(
                                    <ContainerAllItems>
                                         <CompetitionStyled key={index+1} onClick={() => this.handleLinkPage(competition.index)}>
-                                            <HeaderText  small item>{index+1}</HeaderText>
-                                            <HeaderText big item>{competition.competition_name}</HeaderText>
-                                            <HeaderText item>{competition.location}</HeaderText>
-                                            <HeaderText item>{competition.date}</HeaderText>
+                                            <HeaderText item small>{index+1}</HeaderText>
+                                            <HeaderText item big>{competition.competition_name}</HeaderText>
+                                            <HeaderText item big>{competition.location}</HeaderText>
+                                            <HeaderText item small>{competition.date}</HeaderText>
+                                            <HeaderText item>{competition.time_start} : {competition.time_end}</HeaderText>
                                             <HeaderText item >
                                                 {competition.manager_name_title}
                                                 {competition.manager_first_name}
