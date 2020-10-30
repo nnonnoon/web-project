@@ -92,6 +92,15 @@ managerDomain.deleteCompetition = async(manager, competition_index) => {
     }
 }
 
+managerDomain.deleteUserOfCompetition = async(manager, competition_index) => {
+    try{
+        await manager.query(`DELETE FROM "user" WHERE competition_index = ${competition_index}`);
+
+    }catch(err){
+        throw err;
+    }
+}
+
 
 //---User---//
 
@@ -221,6 +230,61 @@ managerDomain.tag = async(manager, tag_name) => {
         `);
         return tag.rows;
 
+    }catch(err){
+        throw err;
+    }
+}
+
+//---Gate---//
+
+managerDomain.addGate = async(manager, payload) => {
+    try{
+        await manager.query(`
+            INSERT INTO "gate" (gate_number, gate_ip)
+            VALUES (${payload.gate_number}, '${payload.gate_ip}')`);
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.fetchAllGate = async(manager) => {
+    try{
+        const allGate = await manager.query(`
+            SELECT gate_number, gate_ip
+            FROM gate`);
+        return allGate.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.checkGateNo = async(manager, payload) => {
+    try{
+        const checkGateNo = await manager.query(`
+            SELECT gate_number, gate_ip
+            FROM gate
+            WHERE gate_number = ${payload.gate_number}`);
+        return checkGateNo.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.checkGateIp = async(manager, payload) => {
+    try{
+        const checkGateIp = await manager.query(`
+            SELECT gate_number, gate_ip
+            FROM gate
+            WHERE gate_ip = '${payload.gate_ip}'`);
+        return checkGateIp.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.deleteGate = async(manager, gate_index) => {
+    try{
+        await manager.query(`DELETE FROM "gate" WHERE index = ${gate_index}`);
     }catch(err){
         throw err;
     }

@@ -130,6 +130,7 @@ managerController.deleteCompetition = async(req, res, next) => {
 
     try{
         await manager.query("BEGIN");
+        await managerDomain.deleteUserOfCompetition(manager, competition_index)
         await managerDomain.deleteCompetition(manager, competition_index);
         await manager.query("COMMIT");
         res.status(200).json({
@@ -259,7 +260,6 @@ managerController.updateUser = async(req, res, next) => {
             if(duplicate_tag.length === 0 || duplicate_tag[0].index == user_index){
                 await managerDomain.updateUser(manager, payload);
                 await manager.query("COMMIT");
-                await manager.query("COMMIT");
                 res.status(200).json({
                     message: "Update user is success"
                 });
@@ -306,5 +306,93 @@ managerController.deleteUser = async(req, res, next) => {
         await manager.release();
     }
 }
+
+//---Gate---//
+
+managerController.addGate = async(req, res, next) => {
+    const payload = req.body;
+    const manager = await pool.connect();
+
+    try{
+        await manager.query("BEGIN");
+        const checkGateNo = await managerDomain.checkGateNo(manager, payload);
+
+        if(checkGateNo.length === 0){
+            const checkGateIp = await managerDomain.checkGateIp(manager, payload);
+            if(checkGateIp.length === 0){
+                await managerDomain.addGate(manager, payload);
+                await manager.query("COMMIT");
+                res.status(200).json({
+                    message: "Add gate success"
+                });
+            }else{
+                res.status(400).json({
+                    message: "Ip address is duplicate"
+                });
+            }
+        }else{
+            res.status(400).json({
+                message: "Gate No is duplicate"
+            });
+        }
+
+        
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Add gate is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.fetchAllGate = async(req, res, next) => {
+    const manager = await pool.connect();
+
+    try{
+        await manager.query("BEGIN");
+        const allGate = await managerDomain.fetchAllGate(manager);
+        await manager.query("COMMIT");
+
+        res.status(200).json({
+            gate: allGate
+        })
+
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Fetch all gate is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.deleteGate = async(req, res, next) => {
+    const { gate_index } = req.params; 
+    const manager = await pool.connect();
+    
+    try{
+        await manager.query("BEGIN");
+        await managerDomain.deleteGate(manager, gate_index);
+        await manager.query("COMMIT");
+        res.status(200).json({
+            message: "Delete  gate success"
+        });
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Delete  gate is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+
 
 export default managerController;
