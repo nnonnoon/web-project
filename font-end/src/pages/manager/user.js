@@ -1,8 +1,7 @@
 import React, { Component  } from 'react';
 import Navbar from '../component/navbar';
 import MediaQuery from "react-responsive";
-import { Button, Modal, Form, Input, message, Menu, Dropdown} from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Button, Modal, Form, Input, message } from 'antd';
 import { manager } from '../../services/api'
 import styled from 'styled-components'
 import edit from '../../assets/icon/edit.svg'
@@ -11,9 +10,9 @@ import trash_comfirm from '../../assets/icon/trash_comfirm.svg'
 
 const ContainerLayout = styled.div`
     display: flex;
-    flex-direction: column;
     position: relative;
-    padding: 3.5rem 10% 0 10%;
+    padding: 3.5rem 5% 0 0;
+    height: 100%;
 `
 const ContainerOption = styled.div`
     display: flex;
@@ -49,7 +48,7 @@ const ContainerButton = styled.div`
 const ContainerItems = styled.div`
     display: flex;
     flex-direction: column;
-    height: 27rem;
+    height: 35rem;
     overflow: scroll;
 `
 
@@ -109,7 +108,7 @@ const FormAll = styled(Form)`
     width: 100%;
 `
 const StyledModal = styled(Modal)`
-    margin-top: ${props => props.edit ? "-4.5rem" : props.add ? "-2rem": ""};
+    margin-top: ${props => props.edit ? "-2rem" : props.add ? "-2rem": ""};
     .ant-modal-content{
         background: rgba(163, 213, 252);
         border-radius: 2rem;
@@ -152,13 +151,53 @@ const ContainerPicture = styled.div`
     margin-bottom: 1rem;
 `
 
+const Menu = styled.div`
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    background: ${props => props.competition_name ? "#FF5050" : "#F9A826"};
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    padding: 1rem;
+    cursor: ${props => props.competition_name ? "" : "pointer"};
+    :hover{
+        background: ${props => props.competition_name ? "" : "#FF9D00"};
+    }
+`
+
+const ContainerDisplay = styled.div`
+    display:flex;
+    flex-direction: column;
+    margin-left: 5%;
+    width: 80%;
+`
+
+const ContainerMenu = styled.div`
+    display:flex;
+    flex-direction: column;
+    width: 20%;
+`
+
+const MenuTextStyled = styled.div``
+
+const ContainerConfigGate = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 35rem;
+`
+
+
 class user extends Component {
     formRef = React.createRef();
 
     constructor(props){
         super(props);
         this.fetchAllUser();
+        this.fetchCompetition();
         this.state = {
+            isUserMode : false,
+            competition_name: "",
             competition_index: "",
             nameTitle: "",
             firstName: "",
@@ -234,6 +273,24 @@ class user extends Component {
             ({ data }) => {
                 this.setState({
                     user: data.user
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+    fetchCompetition() {
+        let competition_index = window.location.pathname.split("=")[1];
+        manager.fetchCompetition(
+            competition_index,
+            ({ data }) => {
+                console.log(data.competition.competition_name)
+                this.setState({
+                    competition_name: data.competition.competition_name
                 });
             },
             (response) => {
@@ -359,245 +416,270 @@ class user extends Component {
         });
     }
 
+    changeModeUser = () => {
+        this.setState({
+            isUserMode : true
+        });
+    }
+
+    changeModeGate = () => {
+        this.setState({
+            isUserMode : false
+        });
+    }
+
+    isUserMode = () => {
+        return(
+            <>
+                <StyledModal
+                            visible={this.state.visible}
+                            onCancel={this.handleCancel}
+                            title={null}
+                            footer= {null}
+                            add
+                        >
+                            <Text caption >User</Text>
+                            <FormAll onFinish={this.onFinish}  ref={this.formRef}>
+                                <Text>Name title</Text>
+                                    <Form.Item name="nameTitle" rules={[{ required: true, message: 'Missing name title' }]} >
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
+                                    </Form.Item>
+                                <Text>First name</Text>
+                                    <Form.Item name="firstName" rules={[{ required: true, message: 'Missing first name' }]}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Last name</Text>
+                                    <Form.Item  name="lastName" rules={[{ required: true, message: 'Missing last name' }]}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Gender</Text>
+                                    <Form.Item  name="gender" rules={[{ required: true, message: 'Missing gender' }]}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Tag</Text>
+                                    <Form.Item  name="tag" rules={[{ required: true, message: 'Missing tag' }]}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <ContainerSubmit>
+                                    <Form.Item>
+                                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancel}>
+                                            Cancle
+                                        </Button>
+                                    </Form.Item>
+                                    <LitleSpace/>
+                                    <Form.Item>
+                                        <Button 
+                                            key="submit"  htmlType="submit"  
+                                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                            loading={this.state.loading} 
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Form.Item>
+                                </ContainerSubmit>
+                            </FormAll>
+                    </StyledModal>
+    
+                    <StyledModal
+                        visible={this.state.visibleEdit}
+                        onCancel={this.handleCancelEdit}
+                        title={null}
+                        footer= {null}
+                        edit
+                    >
+                        <Text caption >Edit User</Text>
+                        <FormAll onFinish={this.editUser} autoComplete="off"  ref={this.formRef}>
+                                <Text>Name title</Text>
+                                    <Form.Item name="nameTitle" rules={[{ required: true, message: 'Missing name title' }]} initialValue={this.state.nameTitle} >
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/> 
+                                    </Form.Item>
+                                <Text>First name</Text>
+                                    <Form.Item name="firstName" rules={[{ required: true, message: 'Missing first name' }]} initialValue={this.state.firstName}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Last name</Text>
+                                    <Form.Item  name="lastName" rules={[{ required: true, message: 'Missing last name' }]} initialValue={this.state.lastName}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
+                                    </Form.Item>
+                                <Text>Gender</Text>
+                                    <Form.Item  name="gender" rules={[{ required: true, message: 'Missing gender' }]} initialValue={this.state.gender}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
+                                    </Form.Item>
+                                <Text>Tag</Text>
+                                    <Form.Item  name="tag" rules={[{ required: true, message: 'Missing tag' }]} initialValue={this.state.tag}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
+                                    </Form.Item>
+                                <ContainerSubmit>
+                                    <Form.Item>
+                                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancelEdit}>
+                                            Cancle
+                                        </Button>
+                                    </Form.Item>
+                                    <LitleSpace/>
+                                    <Form.Item>
+                                        <Button 
+                                            key="submit"  htmlType="submit"  
+                                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                            loading={this.state.loading} 
+                                            onClick={this.handleOk}
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Form.Item>
+                                </ContainerSubmit>
+                            </FormAll>
+                    </StyledModal>
+    
+                    <StyledModal
+                        visible={this.state.visibleDel}
+                        onCancel={this.handleCancelDel}
+                        title={null}
+                        footer= {null}
+                    >
+                        <ContainerPicture>
+                            <img src={trash_comfirm} alt={trash_comfirm}/>
+                        </ContainerPicture>
+                        <Text caption >Confirm to delete ?</Text>
+                        <ContainerSubmit del>
+                            <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancelDel}>
+                                    Cancle
+                            </Button>
+                            <LitleSpace/>
+                            <Button 
+                                key="submit"  htmlType="submit"  
+                                style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                onClick={this.handleDel}
+                            >
+                                Submit
+                            </Button>
+                        </ContainerSubmit>
+                    </StyledModal>
+    
+                        <ContainerDisplay>
+                            <MediaQuery minDeviceWidth={680}>
+                                    <ContainerOption>
+                                        <ContainerHeader>
+                                            <Header>Users</ Header>
+                                        </ContainerHeader>
+                                        <ContainerButton>
+                                            <StyledButton style={{ width: "10rem"}}>Upload user</StyledButton>
+                                            <TextOr>OR</TextOr>
+                                            <StyledButton onClick={this.showModal} style={{ width: "6rem", }}>ADD</StyledButton>
+                                        </ContainerButton>
+                                    </ContainerOption>
+                                    <ContainerTable>
+                                        <HeaderText  header >No.</HeaderText>
+                                        <HeaderText  header >Name title</HeaderText>
+                                        <HeaderText  header big>First name</HeaderText>
+                                        <HeaderText  header >Last name</HeaderText>
+                                        <HeaderText  header >Gender</HeaderText>
+                                        <HeaderText  header >Tag</HeaderText>
+                                        {/* <HeaderText  header >Status</HeaderText> */}
+                                        <HeaderText  header >Edit</HeaderText>
+                                        <HeaderText  header >Delete</HeaderText>
+                                    </ContainerTable>
+                                    <ContainerItems>
+                                        {
+                                            this.state.user.map((user, index) => {
+                                                return(
+                                                    <ContainerAllItems>
+                                                        <CompetitionStyled key={index+1}>
+                                                            <HeaderText item style={{paddingRight: "10px"}}>{index+1}</HeaderText>
+                                                            <HeaderText item >{user.name_title}</HeaderText>
+                                                            <HeaderText item big >{user.first_name}</HeaderText>
+                                                            <HeaderText item >{user.last_name}</HeaderText>
+                                                            <HeaderText item >{user.gender}</HeaderText>
+                                                            <HeaderText item >{user.tag_name}</HeaderText>
+                                                            {/* <HeaderText item style={{paddingRight: "10px", fontWeight: "bold"}} pendding>{user.status}</HeaderText> */}
+                                                        </CompetitionStyled>
+                                                        <HeaderText option edit item  onClick={() => this.showModalEdit(user.index)}>
+                                                            <img src={edit} alt={edit}></img>
+                                                        </HeaderText>
+                                                        <HeaderText option del item  onClick={() => this.showModalDel(user.index)}>
+                                                            <img src={trashIcon} alt={trashIcon}></img>
+                                                        </HeaderText>
+                                                    </ContainerAllItems>
+                                                )
+                                            })
+                                        }
+                                    </ContainerItems>
+                                </MediaQuery>
+                        </ContainerDisplay>
+            </>
+        )
+    }
+
+    isGatemode = () => {
+        return(
+            <>
+               <ContainerDisplay>
+                    <MediaQuery minDeviceWidth={680}>
+                        <ContainerOption >
+                                <ContainerHeader>
+                                    <Header>Gate</ Header>
+                                </ContainerHeader>
+                                <ContainerButton>
+                                    <StyledButton style={{ width: "6rem"}}>EDIT</StyledButton>
+                                    <TextOr>OR</TextOr>
+                                    <StyledButton style={{ width: "6rem", }}>ADD</StyledButton>
+                                </ContainerButton>
+                        </ContainerOption>
+
+                        <ContainerConfigGate>
+                            <div style={{display: "flex", justifyContent: "space-between" , alignItems: "center", width: "100%", fontSize: "1.5rem", height: "2.5rem",
+                                        background: "#FFD085", paddingLeft: "10%", paddingRight: "10%", marginTop: "2rem" }}>
+                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                    Gate No.
+                                </div>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", marginRight: "1rem"}}>
+                                    IP Address
+                                </div>
+                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                    Used
+                                </div>
+                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                    Delete
+                                </div>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "flex-start" , width: "100%", fontSize: "1.5rem",   }}>Config</div>
+                            <div style={{display: "flex", justifyContent: "flex-start" , width: "100%", fontSize: "1.5rem",   }}>Config</div>
+                        </ContainerConfigGate>
+                        
+                    </MediaQuery>
+                </ContainerDisplay>
+            </>
+        )
+    }
+
     render() {
-        const menu = (
-            <Menu onClick={this.handleMenuClick}>
-              <Menu.Item key="Pending" >
-                Pending
-              </Menu.Item>
-              <Menu.Item key="Pass" >
-                Pass
-              </Menu.Item>
-              <Menu.Item key="Not Pass" >
-                Not Pass
-              </Menu.Item>
-            </Menu>
-        );
         return (
             <ContainerLayout>
                 <Navbar/>
-                <StyledModal
-                    visible={this.state.visible}
-                    onCancel={this.handleCancel}
-                    title={null}
-                    footer= {null}
-                    add
-                >
-                        <Text caption >User</Text>
-                        <FormAll onFinish={this.onFinish}  ref={this.formRef}>
-                            <Text>Name title</Text>
-                                <Form.Item name="nameTitle" rules={[{ required: true, message: 'Missing name title' }]} >
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
-                                </Form.Item>
-                            <Text>First name</Text>
-                                <Form.Item name="firstName" rules={[{ required: true, message: 'Missing first name' }]}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
-                                </Form.Item>
-                            <Text>Last name</Text>
-                                <Form.Item  name="lastName" rules={[{ required: true, message: 'Missing last name' }]}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
-                                </Form.Item>
-                            <Text>Gender</Text>
-                                <Form.Item  name="gender" rules={[{ required: true, message: 'Missing gender' }]}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
-                                </Form.Item>
-                            <Text>Tag</Text>
-                                <Form.Item  name="tag" rules={[{ required: true, message: 'Missing tag' }]}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
-                                </Form.Item>
-                            <ContainerSubmit>
-                                <Form.Item>
-                                    <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancel}>
-                                        Cancle
-                                    </Button>
-                                </Form.Item>
-                                <LitleSpace/>
-                                <Form.Item>
-                                    <Button 
-                                        key="submit"  htmlType="submit"  
-                                        style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
-                                        loading={this.state.loading} 
-                                    >
-                                        Submit
-                                    </Button>
-                                </Form.Item>
-                            </ContainerSubmit>
-                        </FormAll>
-                </StyledModal>
+                <ContainerMenu>
+                    <Menu competition_name style={{ marginTop: '1.75rem',  width: '100%'}} onClick={this.changeModeUser}>
+                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
+                                                fontSize: '1.35rem', color: 'white'}} >
+                            {this.state.competition_name}
+                        </MenuTextStyled>
+                    </Menu>
+                    <Menu style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
+                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
+                                                fontSize: '1.25rem', color: 'white'}} >
+                            Users
+                        </MenuTextStyled>
+                    </Menu>
 
-                <StyledModal
-                    visible={this.state.visibleEdit}
-                    onCancel={this.handleCancelEdit}
-                    title={null}
-                    footer= {null}
-                    edit
-                >
-                    <Text caption >Edit User</Text>
-                    <FormAll onFinish={this.editUser} autoComplete="off"  ref={this.formRef}>
-                            <Text>Name title</Text>
-                                <Form.Item name="nameTitle" rules={[{ required: true, message: 'Missing name title' }]} initialValue={this.state.nameTitle} >
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/> 
-                                </Form.Item>
-                            <Text>First name</Text>
-                                <Form.Item name="firstName" rules={[{ required: true, message: 'Missing first name' }]} initialValue={this.state.firstName}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
-                                </Form.Item>
-                            <Text>Last name</Text>
-                                <Form.Item  name="lastName" rules={[{ required: true, message: 'Missing last name' }]} initialValue={this.state.lastName}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
-                                </Form.Item>
-                            <Text>Gender</Text>
-                                <Form.Item  name="gender" rules={[{ required: true, message: 'Missing gender' }]} initialValue={this.state.gender}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
-                                </Form.Item>
-                            <Text>Tag</Text>
-                                <Form.Item  name="tag" rules={[{ required: true, message: 'Missing tag' }]} initialValue={this.state.tag}>
-                                    <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
-                                </Form.Item>
-                            <Text>Status</Text>
-                                <Form.Item  rules={[{ required: true, message: 'Missing tag' }]} initialValue={this.state.status}>
-                                    <Dropdown overlay={menu}>
-                                        <Button style={{width:'100%', borderRadius:'2rem', height: '2.5rem'}}>
-                                            {this.state.status} <DownOutlined />
-                                        </Button>
-                                    </Dropdown>
-                                </Form.Item>
-                            <ContainerSubmit>
-                                <Form.Item>
-                                    <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancelEdit}>
-                                        Cancle
-                                    </Button>
-                                </Form.Item>
-                                <LitleSpace/>
-                                <Form.Item>
-                                    <Button 
-                                        key="submit"  htmlType="submit"  
-                                        style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
-                                        loading={this.state.loading} 
-                                        onClick={this.handleOk}
-                                    >
-                                        Submit
-                                    </Button>
-                                </Form.Item>
-                            </ContainerSubmit>
-                        </FormAll>
-                </StyledModal>
-
-                <StyledModal
-                    visible={this.state.visibleDel}
-                    onCancel={this.handleCancelDel}
-                    title={null}
-                    footer= {null}
-                >
-                    <ContainerPicture>
-                        <img src={trash_comfirm} alt={trash_comfirm}/>
-                    </ContainerPicture>
-                    <Text caption >Confirm to delete ?</Text>
-                    <ContainerSubmit del>
-                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleCancelDel}>
-                                Cancle
-                        </Button>
-                        <LitleSpace/>
-                        <Button 
-                            key="submit"  htmlType="submit"  
-                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
-                            onClick={this.handleDel}
-                        >
-                            Submit
-                        </Button>
-                    </ContainerSubmit>
-                </StyledModal>
-
-                <MediaQuery minDeviceWidth={680}>
-                        <ContainerOption>
-                            <ContainerHeader>
-                                <Header>User</ Header>
-                            </ContainerHeader>
-                            <ContainerButton>
-                                <StyledButton style={{ width: "10rem"}}>Upload user</StyledButton>
-                                <TextOr>OR</TextOr>
-                                <StyledButton onClick={this.showModal} style={{ width: "6rem", }}>ADD</StyledButton>
-                            </ContainerButton>
-                        </ContainerOption>
-                        <ContainerTable>
-                            <HeaderText  header >No.</HeaderText>
-                            <HeaderText  header big>Name title</HeaderText>
-                            <HeaderText  header big>First name</HeaderText>
-                            <HeaderText  header big>Last name</HeaderText>
-                            <HeaderText  header >Gender</HeaderText>
-                            <HeaderText  header >Tag</HeaderText>
-                            <HeaderText  header >Status</HeaderText>
-                            <HeaderText  header >Edit</HeaderText>
-                            <HeaderText  header >Delete</HeaderText>
-                        </ContainerTable>
-                        <ContainerItems>
-                            {
-                                this.state.user.map((user, index) => {
-                                    if(user.status === "Pending"){
-                                        return(
-                                            <ContainerAllItems>
-                                                <CompetitionStyled key={index+1}>
-                                                    <HeaderText item style={{paddingRight: "10px"}}>{index+1}</HeaderText>
-                                                    <HeaderText item >{user.name_title}</HeaderText>
-                                                    <HeaderText item big style={{paddingLeft: "10px"}} >{user.first_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "15px"}}>{user.last_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "25px"}}>{user.gender}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "10px"}}>{user.tag_name}</HeaderText>
-                                                    <HeaderText item style={{paddingRight: "10px", fontWeight: "bold"}} pendding>{user.status}</HeaderText>
-                                                </CompetitionStyled>
-                                                <HeaderText option edit item small style={{paddingRight: "5px"}} onClick={() => this.showModalEdit(user.index)}>
-                                                    <img src={edit} alt={edit}></img>
-                                                </HeaderText>
-                                                <HeaderText option del item small onClick={() => this.showModalDel(user.index)}>
-                                                    <img src={trashIcon} alt={trashIcon}></img>
-                                                </HeaderText>
-                                            </ContainerAllItems>
-                                        )
-                                    }else if (user.status === "Pass") {
-                                        return(
-                                            <ContainerAllItems>
-                                                <CompetitionStyled key={index+1}>
-                                                    <HeaderText item style={{paddingRight: "10px"}}>{index+1}</HeaderText>
-                                                    <HeaderText item >{user.name_title}</HeaderText>
-                                                    <HeaderText item big style={{paddingLeft: "10px"}} >{user.first_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "15px"}}>{user.last_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "25px"}}>{user.gender}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "10px"}}>{user.tag_name}</HeaderText>
-                                                    <HeaderText item style={{paddingRight: "10px", fontWeight: "bold"}} pass>{user.status}</HeaderText>
-                                                </CompetitionStyled>
-                                                <HeaderText option edit item small style={{paddingRight: "5px"}} onClick={() => this.showModalEdit(user.index)}>
-                                                    <img src={edit} alt={edit}></img>
-                                                </HeaderText>
-                                                <HeaderText option del item small onClick={() => this.showModalDel(user.index)}>
-                                                    <img src={trashIcon} alt={trashIcon}></img>
-                                                </HeaderText>
-                                            </ContainerAllItems>
-                                        )
-                                    }else{
-                                        return(
-                                            <ContainerAllItems>
-                                                <CompetitionStyled key={index+1}>
-                                                    <HeaderText item style={{paddingRight: "10px"}}>{index+1}</HeaderText>
-                                                    <HeaderText item >{user.name_title}</HeaderText>
-                                                    <HeaderText item big style={{paddingLeft: "10px"}} >{user.first_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "15px"}}>{user.last_name}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "25px"}}>{user.gender}</HeaderText>
-                                                    <HeaderText item style={{paddingLeft: "10px"}}>{user.tag_name}</HeaderText>
-                                                    <HeaderText item style={{paddingRight: "10px", fontWeight: "bold"}} notPass>{user.status}</HeaderText>
-                                                </CompetitionStyled>
-                                                <HeaderText option edit item small style={{paddingRight: "5px"}} onClick={() => this.showModalEdit(user.index)}>
-                                                    <img src={edit} alt={edit}></img>
-                                                </HeaderText>
-                                                <HeaderText option del item small onClick={() => this.showModalDel(user.index)}>
-                                                    <img src={trashIcon} alt={trashIcon}></img>
-                                                </HeaderText>
-                                            </ContainerAllItems>
-                                        )
-                                    }
-                                })
-                            }
-                        </ContainerItems>
-                    </MediaQuery>
+                    <Menu style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
+                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
+                                                fontSize: '1.25rem', color: 'white'}}  
+                                                >
+                            Gates
+                        </MenuTextStyled>
+                    </Menu>
+                </ContainerMenu>
+                    {
+                        this.state.isUserMode ? this.isUserMode() : this.isGatemode() 
+                    }
             </ContainerLayout>
         );
     }
