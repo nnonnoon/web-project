@@ -1,12 +1,13 @@
 import React, { Component  } from 'react';
 import Navbar from '../component/navbar';
 import MediaQuery from "react-responsive";
-import { Button, Modal, Form, Input, message } from 'antd';
+import { Button, Modal, Form, Input, message,  Dropdown, Menu } from 'antd';
 import { manager } from '../../services/api'
 import styled from 'styled-components'
 import edit from '../../assets/icon/edit.svg'
 import trashIcon from '../../assets/icon/bin.svg'
 import trash_comfirm from '../../assets/icon/trash_comfirm.svg'
+import { DownOutlined } from '@ant-design/icons';
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -151,7 +152,7 @@ const ContainerPicture = styled.div`
     margin-bottom: 1rem;
 `
 
-const Menu = styled.div`
+const MenuOption = styled.div`
     display:flex;
     flex-direction: column;
     align-items: center;
@@ -187,6 +188,36 @@ const ContainerConfigGate = styled.div`
     height: 35rem;
 `
 
+const  ContainerAllGate = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 3rem;
+    border-bottom: #FFD085 solid;
+`
+
+// const ContainerDelGate = styled.div`
+//     display: flex;
+//     align-items: center;
+//     width: 20%;
+
+// `
+
+const GateStyle = styled.div`
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    height: 3rem;
+    font-size: "16px";
+    width: 20% ;
+    cursor: pointer;
+
+    :hover{
+        background: ${props => props.edit ? "#FFE4B8" : "#FFB5B5" } ;
+    }
+`
+
+
 
 class user extends Component {
     formRef = React.createRef();
@@ -195,8 +226,9 @@ class user extends Component {
         super(props);
         this.fetchAllUser();
         this.fetchCompetition();
+        this.fetchAllGate();
         this.state = {
-            isUserMode : false,
+            isUserMode : true,
             competition_name: "",
             competition_index: "",
             nameTitle: "",
@@ -209,7 +241,18 @@ class user extends Component {
             visibleEdit: false,
             visibleDel: false ,
             userIndex: "",
-            user: []
+            user: [],
+            gate: [],
+            visibleGate: false,
+            visibleGateEdit: false,
+            visibleGateDel: false,
+            gateIndex: "",
+            gateNo: "",
+            gateIP: "",
+            used: "Not Used",
+            disableAddGate: false,
+            ableGate: true,
+            
         }
         this.handleDel = this.handleDel.bind(this);
     }
@@ -335,7 +378,7 @@ class user extends Component {
 
     showModalDel = (userIndex) => {
         this.setState({
-            visibleDel: true,
+            visibleGateDel: true,
             userIndex: userIndex
         });
     }
@@ -359,7 +402,7 @@ class user extends Component {
         );
     }
 
-    handleCancelDel= () => {
+    handleCancelDel = () => {
         this.setState({ 
             visibleDel: false 
         });
@@ -428,16 +471,226 @@ class user extends Component {
         });
     }
 
+    fetchAllGate() {
+        let competition_index = window.location.pathname.split("=")[1];
+        manager.fetchAllGate(
+            competition_index,
+            ({ data }) => {
+                this.setState({
+                    gate: data.gate
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+    toggle() {
+        this.setState({
+            disable: false
+        });
+    }
+
+    showModalDel = (gateIndex) => {
+        this.setState({
+            visibleGateDel: true,
+            gateIndex: gateIndex
+        });
+    }
+
+    handleGateDel = () => {
+        let gateindex = this.state.gateIndex;
+        manager.deleteGate(
+            gateindex ,
+            ({ data }) => {
+                this.setState({ 
+                    visibleGateDel: false 
+                });
+                message.success("Delete gate success");
+                this.fetchAllGate();
+            },
+            (response) => {
+                console.log(response.data.message);
+            }
+        );
+    }
+
+    handleGateCancelDel  = () => {
+        this.setState({ 
+            visibleGateDel: false 
+        });
+    }
+
+    showModelGateAdd = () => {
+        this.setState({
+            visibleGate: true
+        })
+    }
+
+    onGateFinish = (values) => {
+        this.setState(values);
+        this.handleAddGate();
+    }
+
+    handleAddGate(){
+        let competition_index = window.location.pathname.split("=")[1];
+        const payload = {
+            competition_index: competition_index,
+            gate_number: this.state.gateNo,
+            gate_ip: this.state.gateIP,
+            used: this.state.used,
+        };
+
+        console.log(payload)
+
+        manager.addGate(
+            payload,
+            ({ data }) => {
+                this.setState({ 
+                    visible: false,
+                    gate_number: "",
+                    gate_ip: "",
+                    used: "Not Used",
+                    visibleGate: false 
+                });
+                message.success("Add gate success");
+                this.formRef.current.resetFields();
+                this.fetchAllGate();
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+    }
+
+    // editGate = () => {
+    //     this.setState({
+    //         disable: false,
+    //         disableAddGate: true,
+    //         ableGate: false
+    //     });
+    // }
+
+    editGate = (values) => {
+        console.log(values)
+        this.setState(values);
+        this.updateGate();
+    }
+
+    updateGate () {
+        let competition_index = window.location.pathname.split("=")[1];
+        let gate_index = this.state.gateIndex;
+        const payload = {
+            competition_index: competition_index,
+            gate_number: this.state.gateNo,
+            gate_ip: this.state.gateIP,
+            used: this.state.used
+        };
+
+        console.log(payload)
+
+        manager.updateGate(
+            gate_index,
+            payload,
+            ({ data }) => {
+                this.setState({ 
+                    gateNo: "",
+                    gateIP: "",
+                    used: "Not Used",
+                    visibleGateEdit: false 
+                });
+                message.success("Edit user success");
+                this.fetchAllGate();
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+    showModalGateEdit = (gateIndex) => {
+        this.setState({
+            visibleGateEdit: true,
+            gateIndex: gateIndex
+        })
+
+        let competition_index = window.location.pathname.split("=")[1];
+        const payload = {
+            competition_index: competition_index
+        };
+        manager.fetchGate(
+            gateIndex ,
+            payload,
+            ({ data }) => {
+                console.log(data.gate[0].used)
+                this.formRef.current.setFieldsValue({
+                    gateNo: data.gate[0].gate_number,
+                    gateIP: data.gate[0].gate_ip,
+                });
+                this.setState({
+                    used: data.gate[0].used
+                })
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+    handleGateCancelEdit = () => {
+        this.setState({
+            visibleGateEdit: false,
+            used: "Not Used"
+        });
+    }
+
+    checkGateIP = (gate_ip) =>{
+        const payload = {
+            gate_ip : gate_ip
+        }
+
+        console.log(gate_ip)
+
+        manager.checkGateIP(
+            payload,
+            ({ data }) => {
+                message.success("success");
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+    }
+
+    changeUsed = (value) => {
+        console.log(value.key)
+        this.setState({
+            used: value.key
+        })
+    }
+
+
     isUserMode = () => {
         return(
             <>
                 <StyledModal
-                            visible={this.state.visible}
-                            onCancel={this.handleCancel}
-                            title={null}
-                            footer= {null}
-                            add
-                        >
+                    visible={this.state.visible}
+                    onCancel={this.handleCancel}
+                    title={null}
+                    footer= {null}
+                    add
+                >
                             <Text caption >User</Text>
                             <FormAll onFinish={this.onFinish}  ref={this.formRef}>
                                 <Text>Name title</Text>
@@ -610,44 +863,245 @@ class user extends Component {
     }
 
     isGatemode = () => {
+        const menu = (
+            <Menu onClick={this.changeUsed}>
+                <Menu.Item key="Used" >
+                    Used
+                </Menu.Item>
+                <Menu.Item key="Not Used" >
+                    Not Used
+                </Menu.Item>
+            </Menu>
+        );
+
         return(
             <>
+                <StyledModal
+                    visible={this.state.visibleGate}
+                    onCancel={ () => this.setState({visibleGate: false })}
+                    title={null}
+                    footer= {null}
+                >
+                            <Text caption >Gate</Text>
+                            <FormAll onFinish={this.onGateFinish}  ref={this.formRef}>
+                                <Text>Gate No</Text>
+                                    <Form.Item name="gateNo" rules={[{ required: true, message: 'Missing gate no' }]} >
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true" />
+                                    </Form.Item>
+                                <Text>IP Address</Text>
+                                    <Form.Item name="gateIP" rules={[{ required: true, message: 'Missing ip address' }]} >
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Used</Text>
+                                    <Form.Item>
+                                        <Dropdown overlay={menu}  >
+                                            <Button style={{width:'100%', borderRadius:'2rem', height: '2.5rem'}}>
+                                                {this.state.used} <DownOutlined />
+                                            </Button>
+                                        </Dropdown>
+                                    </Form.Item>
+                                <ContainerSubmit>
+                                    <Form.Item>
+                                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={() => this.setState({visibleGate: false})}>
+                                            Cancle
+                                        </Button>
+                                    </Form.Item>
+                                    <LitleSpace/>
+                                    <Form.Item>
+                                        <Button 
+                                            key="submit"  htmlType="submit"  
+                                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Form.Item>
+                                </ContainerSubmit>
+                            </FormAll>
+                    </StyledModal>
+                    
+                    <StyledModal
+                        visible={this.state.visibleGateEdit}
+                        onCancel={this.handleGateCancelEdit}
+                        title={null}
+                        footer= {null}
+                    >
+                        <Text caption >Edit Gate</Text>
+                        <FormAll onFinish={this.editGate} autoComplete="off"  ref={this.formRef}>
+                                <Text>Gate No.</Text>
+                                    <Form.Item name="gateNo" rules={[{ required: true, message: 'Missing Gate No' }]} initialValue={this.state.gateNo} >
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/> 
+                                    </Form.Item>
+                                <Text>IP Address</Text>
+                                    <Form.Item name="gateIP" rules={[{ required: true, message: 'Missing Gate IP' }]} initialValue={this.state.gateIP}>
+                                        <Input style={{borderRadius:'2rem', height: '2.5rem'}} allowClear="true"/>
+                                    </Form.Item>
+                                <Text>Used</Text>
+                                    <Form.Item>
+                                        <Dropdown overlay={menu}>
+                                            <Button style={{width:'100%', borderRadius:'2rem', height: '2.5rem'}}>
+                                                {this.state.used} <DownOutlined />
+                                            </Button>
+                                        </Dropdown>
+                                    </Form.Item>
+                                <ContainerSubmit>
+                                    <Form.Item >
+                                        <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleGateCancelEdit}>
+                                            Cancle
+                                        </Button>
+                                    </Form.Item>
+                                    <LitleSpace/>
+                                    <Form.Item>
+                                        <Button 
+                                            key="submit"  htmlType="submit"  
+                                            style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Form.Item>
+                                </ContainerSubmit>
+                            </FormAll>
+                    </StyledModal>
+
+                    <StyledModal
+                        visible={this.state.visibleGateDel}
+                        onCancel={this.handleGateCancelDel}
+                        title={null}
+                        footer= {null}
+                    >
+                        <ContainerPicture>
+                            <img src={trash_comfirm} alt={trash_comfirm}/>
+                        </ContainerPicture>
+                        <Text caption >Confirm to delete ?</Text>
+                        <ContainerSubmit del>
+                            <Button key="back" style={{borderRadius:'2rem', background: '#E5E5E5', fontSize: '18px', height: '2.5rem'}} onClick={this.handleGateCancelDel}>
+                                    Cancle
+                            </Button>
+                            <LitleSpace/>
+                            <Button 
+                                key="submit"  htmlType="submit"  
+                                style={{borderRadius:'2rem', background: '#F9A826', color: 'black', fontSize: '18px', height: '2.5rem'}} 
+                                onClick={this.handleGateDel}
+                            >
+                                Submit
+                            </Button>
+                        </ContainerSubmit>
+                    </StyledModal>
+
+
+    
                <ContainerDisplay>
                     <MediaQuery minDeviceWidth={680}>
                         <ContainerOption >
                                 <ContainerHeader>
-                                    <Header>Gate</ Header>
+                                    <Header>Gates</ Header>
                                 </ContainerHeader>
                                 <ContainerButton>
-                                    <StyledButton style={{ width: "6rem"}}>EDIT</StyledButton>
-                                    <TextOr>OR</TextOr>
-                                    <StyledButton style={{ width: "6rem", }}>ADD</StyledButton>
+                                    {/* <StyledButton style={{ width: "6rem"}} onClick={this.editGate}>EDIT</StyledButton>
+                                    <TextOr>OR</TextOr> */}
+                                    <StyledButton style={{ width: "6rem", }} onClick={this.showModelGateAdd} disabled={this.state.disableAddGate}>ADD</StyledButton>
                                 </ContainerButton>
                         </ContainerOption>
 
-                        <ContainerConfigGate>
                             <div style={{display: "flex", justifyContent: "space-between" , alignItems: "center", width: "100%", fontSize: "1.5rem", height: "2.5rem",
-                                        background: "#FFD085", paddingLeft: "10%", paddingRight: "10%", marginTop: "2rem" }}>
-                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                        background: "#FFD085", marginTop: "2rem" }}>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", width: "20%"}}>
                                     Gate No.
                                 </div>
-                                <div style={{fontSize: "1rem", fontWeight: "bold", marginRight: "1rem"}}>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", width: "20%", marginRight: "1rem"}}>
                                     IP Address
                                 </div>
-                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", width: "20%"}}>
                                     Used
                                 </div>
-                                <div style={{fontSize: "1rem", fontWeight: "bold"}}>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", width: "20%", paddingRight: "2%"}}>
+                                    Edit
+                                </div>
+                                <div style={{fontSize: "1rem", fontWeight: "bold", width: "20%"}}>
                                     Delete
                                 </div>
                             </div>
-                            <div style={{display: "flex", justifyContent: "flex-start" , width: "100%", fontSize: "1.5rem",   }}>Config</div>
-                            <div style={{display: "flex", justifyContent: "flex-start" , width: "100%", fontSize: "1.5rem",   }}>Config</div>
-                        </ContainerConfigGate>
                         
+                        <ContainerConfigGate>
+                            {
+
+                                this.state.ableGate ? this.showGate(): this.showEditGate () 
+                            }
+                        </ContainerConfigGate>
                     </MediaQuery>
                 </ContainerDisplay>
             </>
+        )
+    }
+
+
+    showGate = ()  => {
+        return(
+            this.state.gate.map((gate, index) => {
+                if(gate.used === "Used"){
+                    return (
+                        <div style={{display: "flex", flexDirection: "row"}}>
+                        <ContainerAllGate key={index+1} style={{display: "flex", justifyContent: "flex-start"}}>
+                            <div style={{fontSize: "16px", width: "20%", paddingRight: "2%"}}>{gate.gate_number}</div>
+                            <div style={{fontSize: "16px", width: "20%", paddingRight: "1%"}}>{gate.gate_ip}</div>
+                            <div style={{fontSize: "16px", fontWeight: "bold", width: "20%", paddingLeft: "2%", color: "green"}}>{gate.used}</div>
+                            <GateStyle edit onClick = {() => this.showModalGateEdit(gate.index)}>
+                                    <img src={edit} alt={edit}/>
+                            </GateStyle>
+                            <GateStyle onClick={() => this.showModalDel(gate.index)} > 
+                                    <img src={trashIcon} alt={trashIcon}/>
+                            </GateStyle>
+                        </ContainerAllGate>
+                        </div> 
+                    
+                    )
+                }else{
+                    return (
+                        <div style={{display: "flex", flexDirection: "row"}}>
+                        <ContainerAllGate key={index+1} style={{display: "flex", justifyContent: "flex-start"}}>
+                            <div style={{fontSize: "16px", width: "20%", paddingRight: "2%"}}>{gate.gate_number}</div>
+                            <div style={{fontSize: "16px", width: "20%", paddingRight: "1%"}}>{gate.gate_ip}</div>
+                            <div style={{fontSize: "16px", fontWeight: "bold", width: "20%", paddingLeft: "2%", color: "red"}}>{gate.used}</div>
+                            <GateStyle edit onClick = {() => this.showModalGateEdit(gate.index)}>
+                                    <img src={edit} alt={edit}/>
+                            </GateStyle>
+                            <GateStyle onClick={() => this.showModalDel(gate.index)} > 
+                                    <img src={trashIcon} alt={trashIcon}/>
+                            </GateStyle>
+                        </ContainerAllGate>
+                        </div> 
+                    
+                    )
+                }
+            })
+        )
+    }
+
+    showEditGate = () => {
+        return(
+            // this.state.gate.map((gate, index) => {
+            //     return (
+            //         <div style={{display: "flex", flexDirection: "row"}}>
+            //             <ContainerAllGate key={index+1} style={{display: "flex", justifyContent: "flex-start"}}>
+            //                 <div style={{fontSize: "16px", width: "30%"}}>
+            //                     <Input  defaultValue={gate.gate_number}/>
+            //                 </div>
+            //                 <div style={{fontSize: "16px", width: "30%", paddingLeft: "2%"}}>
+            //                     <Input  defaultValue={gate.gate_ip} />
+            //                 </div>
+            //                 <div style={{fontSize: "16px", width: "30%", paddingLeft: "8%"}}>
+            //                     <Switch disabled={this.state.disable}/>
+            //                 </div>
+            //             </ContainerAllGate>
+
+            //             <ContainerDelGate>
+            //                 <GateDelete onClick={() => this.showModalDel(gate.index)} > 
+            //                     <img src={trashIcon} alt={trashIcon}/>
+            //                 </GateDelete>
+            //             </ContainerDelGate>
+            //         </div>   
+            //     )
+            // })
+            <></>
         )
     }
 
@@ -656,26 +1110,26 @@ class user extends Component {
             <ContainerLayout>
                 <Navbar/>
                 <ContainerMenu>
-                    <Menu competition_name style={{ marginTop: '1.75rem',  width: '100%'}} onClick={this.changeModeUser}>
+                    <MenuOption competition_name style={{ marginTop: '1.75rem',  width: '100%'}} onClick={this.changeModeUser}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.35rem', color: 'white'}} >
                             {this.state.competition_name}
                         </MenuTextStyled>
-                    </Menu>
-                    <Menu style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
+                    </MenuOption>
+                    <MenuOption style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.25rem', color: 'white'}} >
                             Users
                         </MenuTextStyled>
-                    </Menu>
+                    </MenuOption>
 
-                    <Menu style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
+                    <MenuOption style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.25rem', color: 'white'}}  
-                                                >
+                        >
                             Gates
                         </MenuTextStyled>
-                    </Menu>
+                    </MenuOption>
                 </ContainerMenu>
                     {
                         this.state.isUserMode ? this.isUserMode() : this.isGatemode() 

@@ -72,4 +72,42 @@ export const manager = {
             .patch(`/updateUser/${user_index}`, payload)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
+
+    
+
+    addGate: (payload, callback, onRejected) => 
+        managerApi
+            .post("/addGate", payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    fetchGate : (gateIndex, payload, callback, onRejected) => 
+        managerApi
+            .post(`/fetchGate/${gateIndex}`, payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    fetchAllGate: (competition_index, callback, onRejected) => 
+        managerApi
+            .get(`/fetchAllGate/${competition_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    updateGate: (gate_index, payload, callback, onRejected) =>
+        managerApi
+            .patch(`/updateGate/${gate_index}`, payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    deleteGate: (gate_index, callback, onRejected) => 
+        managerApi
+            .delete(`/deleteGate/${gate_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    checkGateNo: (payload, callback, onRejected) => 
+        managerApi
+            .post(`/checkGateNo`, payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
+    checkGateIP: (payload, callback, onRejected) => 
+        managerApi
+            .post(`/checkGateIP`, payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
 }
