@@ -16,7 +16,12 @@ router.patch("/updateUser/:user_index", managerController.updateUser);
 router.delete("/deleteUser/:user_index", managerController.deleteUser);
 
 router.post("/addGate", managerController.addGate);
-router.get("/fetchAllGate", managerController.fetchAllGate);
+router.post("/fetchGate/:gate_index", managerController.fetchGate);
+router.get("/fetchAllGate/:competition_index", managerController.fetchAllGate);
+router.patch("/updateGate/:gate_index", managerController.updateGate);
 router.delete("/deleteGate/:gate_index", managerController.deleteGate);
+
+router.post("/checkGateNo", managerController.checkGateNo);
+router.post("/checkGateIP", managerController.checkGateIP);
 
 export default router;

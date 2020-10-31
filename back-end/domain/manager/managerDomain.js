@@ -247,11 +247,34 @@ managerDomain.addGate = async(manager, payload) => {
     }
 }
 
+managerDomain.fetchGate = async(manager, gate_index) => {
+    try{
+        const gate = await manager.query(`
+            SELECT index, gate_number, gate_ip
+            FROM "gate"
+            WHERE index =${gate_index}`);
+        return gate.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.updateGate = async(manager, payload) => {
+    try{
+        await manager.query(`
+            UPDATE "gate" SET  gate_number = ${payload.gate_number} , gate_ip = '${payload.gate_ip}'
+            WHERE index = ${payload.index}`);
+    }catch(err){
+        throw err;
+    }
+}
+
 managerDomain.fetchAllGate = async(manager) => {
     try{
         const allGate = await manager.query(`
-            SELECT gate_number, gate_ip
-            FROM gate`);
+            SELECT index, gate_number, gate_ip
+            FROM gate
+            ORDER BY gate_number ASC`);
         return allGate.rows;
     }catch(err){
         throw err;
@@ -285,6 +308,60 @@ managerDomain.checkGateIp = async(manager, payload) => {
 managerDomain.deleteGate = async(manager, gate_index) => {
     try{
         await manager.query(`DELETE FROM "gate" WHERE index = ${gate_index}`);
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.sameGate = async(manager, payload) => {
+    try{
+        const sameGate = await manager.query(`
+            SELECT index
+            FROM "gate"
+            WHERE gate_number = ${payload.gate_number} AND gate_ip = '${payload.gate_ip}'
+        `);
+
+        if(sameGate.rows.length  == 0){
+            return 0
+        }else{
+            return sameGate.rows[0].index;
+        }
+    }catch(err){
+        throw err;
+    }
+}
+
+//---Gate_Per_Copetition---//
+
+managerDomain.addGatePerCompetition = async(manager, payload) => {
+    try{
+        await manager.query(`
+            INSERT INTO "gate_per_competition" (competition_index, gate_number)
+            VALUES (${payload.competition_index}, ${payload.gate_number})
+        `);
+    }catch(err){
+        throw err;
+    }
+
+}
+
+managerDomain.fetchGatePerCompetition = async(manager, competition_index) => {
+    try{
+        const used = await manager.query(`
+            SELECT gate_number
+            FROM "gate_per_competition"
+            WHERE competition_index = ${competition_index}
+        `);
+
+        return used.rows;
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.deleteGatePerCompetition = async(manager, gate_number) => {
+    try{
+        await manager.query(`DELETE FROM "gate_per_competition" WHERE gate_number = ${gate_number}`);
     }catch(err){
         throw err;
     }

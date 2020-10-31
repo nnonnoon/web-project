@@ -1,3 +1,4 @@
+import { response } from 'express';
 import pool from '../../database/database'
 import managerDomain from '../../domain/manager/managerDomain'
 
@@ -315,6 +316,10 @@ managerController.addGate = async(req, res, next) => {
 
     try{
         await manager.query("BEGIN");
+        if(payload.used == "Used"){
+            await managerDomain.addGatePerCompetition(manager, payload);
+        }
+
         const checkGateNo = await managerDomain.checkGateNo(manager, payload);
 
         if(checkGateNo.length === 0){
@@ -349,15 +354,42 @@ managerController.addGate = async(req, res, next) => {
 }
 
 managerController.fetchAllGate = async(req, res, next) => {
+    const { competition_index } = req.params;
     const manager = await pool.connect();
 
     try{
         await manager.query("BEGIN");
+        const used = await managerDomain.fetchGatePerCompetition(manager, competition_index)
         const allGate = await managerDomain.fetchAllGate(manager);
         await manager.query("COMMIT");
 
+        let payload = [];
+       
+        for(let i = 0 ; i< allGate.length ; i++) {
+            let check = 0;
+            let tmp = {}
+            for(let j = 0 ; j< used.length ; j++){
+                if(allGate[i].gate_number == used[j].gate_number){
+                    tmp["index"] = allGate[i].index
+                    tmp["gate_number"] = allGate[i].gate_number
+                    tmp["gate_ip"] = allGate[i].gate_ip
+                    tmp["used"] = "Used"
+                    check = 1;
+                    payload.push(tmp)
+                    break;
+                }
+            }
+            if( check == 0){
+                tmp["index"] = allGate[i].index
+                tmp["gate_number"] = allGate[i].gate_number
+                tmp["gate_ip"] = allGate[i].gate_ip
+                tmp["used"] = "Not Used"
+                payload.push(tmp)
+            }
+        }
+
         res.status(200).json({
-            gate: allGate
+            gate: payload
         })
 
     }catch(err){
@@ -365,6 +397,65 @@ managerController.fetchAllGate = async(req, res, next) => {
         console.log(err);
         res.status(500).json({
             message: "Fetch all gate is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.updateGate = async(req, res, next) => {
+    const { gate_index } = req.params;
+    const payload = req.body;
+    const manager = await pool.connect();
+
+    try{
+        await manager.query("BEGIN");
+        payload["index"] = gate_index;
+
+        if(payload.used == "Not Used"){
+            await managerDomain.deleteGatePerCompetition(manager, payload.gate_number);
+        }
+
+        if(payload.used == "Used"){
+            await managerDomain.addGatePerCompetition(manager, payload);
+        }
+
+        const same_gate = await managerDomain.sameGate(manager, payload);
+
+        if(same_gate == gate_index){
+            await managerDomain.updateGate(manager, payload);
+            await manager.query("COMMIT");
+            res.status(200).json({
+                message: "Update gate success"
+            });
+        }else{
+            const checkGateNo = await managerDomain.checkGateNo(manager, payload);
+            const gate = await managerDomain.fetchGate(manager, gate_index);
+            if(checkGateNo.length === 0 || gate.gate_number == payload.gate_number){
+                const checkGateIp = await managerDomain.checkGateIp(manager, payload);
+                if(checkGateIp.length === 0 ){
+                    await managerDomain.updateGate(manager, payload);
+                    await manager.query("COMMIT");
+                    res.status(200).json({
+                        message: "Update gate success"
+                    });
+                }else{
+                    res.status(400).json({
+                        message: "Ip address is duplicate"
+                    });
+                }
+            }else{
+                res.status(400).json({
+                    message: "Gate No is duplicate"
+                });
+            }
+        }
+
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Update gate is error"
         });
     }finally{
         await manager.release();
@@ -393,6 +484,109 @@ managerController.deleteGate = async(req, res, next) => {
     }
 }
 
+managerController.checkGateNo = async(req, res, next) => {
+    const payload = req.body;
+    const manager = await pool.connect();
 
+    try{
+        await manager.query("BEGIN");
+        const checkGateNo =  await managerDomain.checkGateNo(manager, payload);
+        await manager.query("COMMIT");
+        if(checkGateNo.length === 0){
+            res.status(200).json({
+                message: "check  gate no success"
+            });
+        }else{
+            res.status(400).json({
+                message: "Gate No is duplicate"
+            });
+        }
+        
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "check  gate number is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.checkGateIP = async(req, res, next) => {
+    const payload = req.body;
+    const manager = await pool.connect();
+
+    try{
+        await manager.query("BEGIN");
+        const checkGateIP =  await managerDomain.checkGateIp(manager, payload);
+        await manager.query("COMMIT");
+        if(checkGateIP.length === 0){
+            res.status(200).json({
+                message: "check  gate no success"
+            });
+        }else{
+            res.status(400).json({
+                message: "Gate ip address is duplicate"
+            });
+        }
+        
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "check  gate number is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
+
+managerController.fetchGate = async(req, res, next) => {
+    const { gate_index } = req.params;
+    const { competition_index } = req.body;
+    const manager = await pool.connect();
+
+    try{
+
+        await manager.query("BEGIN");
+        const gate =  await managerDomain.fetchGate(manager, gate_index);
+        const used = await managerDomain.fetchGatePerCompetition(manager, competition_index)
+        await manager.query("COMMIT");
+
+        let payload = [];
+        let tmp = {};
+        let tod = 0;
+        for(let i = 0 ; i < used.length ; i++){
+            if(gate[0].gate_number == used[i].gate_number){
+                tmp["index"] = gate[0].index;
+                tmp["gate_number"] = gate[0].gate_number;
+                tmp["gate_ip"] = gate[0].gate_ip;
+                tmp["used"] = "Used";
+                payload.push(tmp);
+                tod = 1;
+            }
+        }
+        if(tod == 0){
+            tmp["index"] = gate[0].index;
+            tmp["gate_number"] = gate[0].gate_number;
+            tmp["gate_ip"] = gate[0].gate_ip;
+            tmp["used"] = "Not Used";
+            payload.push(tmp);
+        }
+
+        res.status(200).json({
+            gate : payload
+        });
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Fetch gate is error"
+        });
+    }finally{
+        await manager.release();
+    }
+}
 
 export default managerController;
