@@ -72,8 +72,12 @@ export const manager = {
             .patch(`/updateUser/${user_index}`, payload)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
+    uploadUsers: (payload, callback, onRejected) => 
+        managerApi
+            .post("/uploadUsers", payload)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),
 
-    
 
     addGate: (payload, callback, onRejected) => 
         managerApi

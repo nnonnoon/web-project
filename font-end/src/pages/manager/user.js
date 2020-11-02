@@ -8,6 +8,7 @@ import edit from '../../assets/icon/edit.svg'
 import trashIcon from '../../assets/icon/bin.svg'
 import trash_comfirm from '../../assets/icon/trash_comfirm.svg'
 import { DownOutlined } from '@ant-design/icons';
+import ReactFileReader from 'react-file-reader';
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -37,7 +38,6 @@ const CompetitionStyled = styled.div`
     display: flex;
     width: 100%;
     height: 3rem;
-    cursor: pointer;
 `
 
 const ContainerButton = styled.div`
@@ -252,11 +252,89 @@ class user extends Component {
             used: "Not Used",
             disableAddGate: false,
             ableGate: true,
+            csvfile: undefined
             
         }
         this.handleDel = this.handleDel.bind(this);
     }
 
+//---Fetch_Competition---//
+
+    fetchCompetition() {
+        let competition_index = window.location.pathname.split("=")[1];
+        manager.fetchCompetition(
+            competition_index,
+            ({ data }) => {
+                console.log(data.competition.competition_name)
+                this.setState({
+                    competition_name: data.competition.competition_name
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+//---Fetch_User---//
+    fetchAllUser () {
+    let competition_index = window.location.pathname.split("=")[1];
+        manager.fetchAllUser(
+            competition_index,
+            ({ data }) => {
+                this.setState({
+                    user: data.user
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+    
+//---Fetch_Gate---//
+    fetchAllGate() {
+        let competition_index = window.location.pathname.split("=")[1];
+        manager.fetchAllGate(
+            competition_index,
+            ({ data }) => {
+                this.setState({
+                    gate: data.gate
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+//---Change_Mode---//  
+
+    changeModeUser = () => {
+    this.setState({
+        isUserMode : true
+    });
+    }
+
+    changeModeGate = () => {
+    this.setState({
+        isUserMode : false
+    });
+    }
+
+    handleMenuClick = (values) => {
+        this.setState({
+            status: values.key
+        });
+    }
+
+//---User_Add---//
 
     handleCancel = () => {
         this.setState({ 
@@ -309,40 +387,8 @@ class user extends Component {
         );
     } 
 
-    fetchAllUser () {
-        let competition_index = window.location.pathname.split("=")[1];
-        manager.fetchAllUser(
-            competition_index,
-            ({ data }) => {
-                this.setState({
-                    user: data.user
-                });
-            },
-            (response) => {
-                if (response && response.status === 400) {
-                    message.error(response.data.message);
-                }
-            }
-        );
-    }
 
-    fetchCompetition() {
-        let competition_index = window.location.pathname.split("=")[1];
-        manager.fetchCompetition(
-            competition_index,
-            ({ data }) => {
-                console.log(data.competition.competition_name)
-                this.setState({
-                    competition_name: data.competition.competition_name
-                });
-            },
-            (response) => {
-                if (response && response.status === 400) {
-                    message.error(response.data.message);
-                }
-            }
-        );
-    }
+//---User_Edit---//
 
     showModalEdit = (userIndex) => {
         console.log(userIndex)
@@ -373,38 +419,6 @@ class user extends Component {
     handleCancelEdit  = () => {
         this.setState({ 
             visibleEdit: false 
-        });
-    }
-
-    showModalDel = (userIndex) => {
-        this.setState({
-            visibleGateDel: true,
-            userIndex: userIndex
-        });
-    }
-
-    handleDel(){
-        let user_index = this.state.userIndex;
-        console.log(user_index)
-        manager.deleteUser(
-            user_index ,
-            ({ data }) => {
-                console.log(data);
-                this.setState({ 
-                    visibleDel: false 
-                });
-                message.success("Delete user success");
-                this.fetchAllUser();
-            },
-            (response) => {
-                console.log(response.data.message);
-            }
-        );
-    }
-
-    handleCancelDel = () => {
-        this.setState({ 
-            visibleDel: false 
         });
     }
 
@@ -453,48 +467,96 @@ class user extends Component {
         );
     }
 
-    handleMenuClick = (values) => {
+//---User_Delete---//
+
+    showModalDel = (userIndex) => {
         this.setState({
-            status: values.key
+            visibleDel: true,
+            userIndex: userIndex
         });
     }
 
-    changeModeUser = () => {
-        this.setState({
-            isUserMode : true
-        });
-    }
-
-    changeModeGate = () => {
-        this.setState({
-            isUserMode : false
-        });
-    }
-
-    fetchAllGate() {
-        let competition_index = window.location.pathname.split("=")[1];
-        manager.fetchAllGate(
-            competition_index,
+    handleDel(){
+        let user_index = this.state.userIndex;
+        console.log(user_index)
+        manager.deleteUser(
+            user_index ,
             ({ data }) => {
-                this.setState({
-                    gate: data.gate
+                console.log(data);
+                this.setState({ 
+                    visibleDel: false 
                 });
+                message.success("Delete user success");
+                this.fetchAllUser();
             },
             (response) => {
-                if (response && response.status === 400) {
-                    message.error(response.data.message);
-                }
+                console.log(response.data.message);
             }
         );
     }
 
-    toggle() {
-        this.setState({
-            disable: false
+    handleCancelDel = () => {
+        this.setState({ 
+            visibleDel: false 
         });
     }
 
-    showModalDel = (gateIndex) => {
+//---User_Upload---//
+
+    handleFiles = files => {
+
+        var reader = new window.FileReader();
+
+        reader.readAsText(files[0]);
+        
+        reader.onload = (e) => {
+        
+        // Use reader.result
+
+        let csv = reader.result;
+
+        let final = [];
+
+        var lines = csv.split("\n");
+
+        var headers = lines[0].split(",");
+      
+            for(var i=1;i<lines.length;i++){
+
+                var obj = {};
+                var currentline = lines[i].split(",");
+        
+                for(var j=0;j<headers.length;j++){
+                    obj[headers[j]] = currentline[j];
+                    obj["competition_index"] = window.location.pathname.split("=")[1];
+                }
+        
+                final.push(obj);
+            }
+
+            console.log(final)
+            manager.uploadUsers(
+                final,
+                ({ data }) => {
+                    message.success("Upload users is success");
+                    this.fetchAllUser();
+                },
+                (response) => {
+                    if (response && response.status === 400) {
+                        message.error(response.data.message);
+                    }
+                }
+            );
+            
+        }
+
+    }
+
+//----------------------------------------------------------------//
+
+//---Gate_Delete---//
+
+    showModalGateDel = (gateIndex) => {
         this.setState({
             visibleGateDel: true,
             gateIndex: gateIndex
@@ -523,6 +585,9 @@ class user extends Component {
             visibleGateDel: false 
         });
     }
+
+
+//---Gate_Add---//
 
     showModelGateAdd = () => {
         this.setState({
@@ -568,13 +633,7 @@ class user extends Component {
         )
     }
 
-    // editGate = () => {
-    //     this.setState({
-    //         disable: false,
-    //         disableAddGate: true,
-    //         ableGate: false
-    //     });
-    // }
+//---Gate_Edit---//
 
     editGate = (values) => {
         console.log(values)
@@ -653,6 +712,8 @@ class user extends Component {
         });
     }
 
+//---Other---//
+
     checkGateIP = (gate_ip) =>{
         const payload = {
             gate_ip : gate_ip
@@ -679,6 +740,21 @@ class user extends Component {
             used: value.key
         })
     }
+
+    // toggle() {
+    //     this.setState({
+    //         disable: false
+    //     });
+    // }
+
+    // editGate = () => {
+    //     this.setState({
+    //         disable: false,
+    //         disableAddGate: true,
+    //         ableGate: false
+    //     });
+    // }
+
 
 
     isUserMode = () => {
@@ -815,7 +891,9 @@ class user extends Component {
                                             <Header>Users</ Header>
                                         </ContainerHeader>
                                         <ContainerButton>
-                                            <StyledButton style={{ width: "10rem"}}>Upload user</StyledButton>
+                                            <ReactFileReader handleFiles={this.handleFiles} fileTypes={'.csv'}>
+                                                <StyledButton style={{ width: "10rem"}} onClick={this.importCSV}>Upload user</StyledButton>
+                                            </ReactFileReader>
                                             <TextOr>OR</TextOr>
                                             <StyledButton onClick={this.showModal} style={{ width: "6rem", }}>ADD</StyledButton>
                                         </ContainerButton>
@@ -1064,7 +1142,7 @@ class user extends Component {
                             <GateStyle edit onClick = {() => this.showModalGateEdit(gate.index)}>
                                     <img src={edit} alt={edit}/>
                             </GateStyle>
-                            <GateStyle onClick={() => this.showModalDel(gate.index)} > 
+                            <GateStyle onClick={() => this.showModalGateDel(gate.index)} > 
                                     <img src={trashIcon} alt={trashIcon}/>
                             </GateStyle>
                         </ContainerAllGate>
