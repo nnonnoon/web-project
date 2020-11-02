@@ -255,26 +255,37 @@ managerController.updateUser = async(req, res, next) => {
     try{
         await manager.query("BEGIN");
         payload["index"] = user_index;
-        const tag = await managerDomain.tag(manager, payload.tag_name);
-        if(tag.length > 0){
-            const duplicate_tag = await managerDomain.duplicateTag(manager, payload);
-            if(duplicate_tag.length === 0 || duplicate_tag[0].index == user_index){
-                await managerDomain.updateUser(manager, payload);
-                await manager.query("COMMIT");
-                res.status(200).json({
-                    message: "Update user is success"
-                });
+
+        if(payload.tag_name == "Not Defined"){            
+            await managerDomain.updateUser(manager, payload);
+            await manager.query("COMMIT");
+            res.status(200).json({
+                message: "Update user is success"
+            });
+        }else{
+            const tag = await managerDomain.tag(manager, payload.tag_name);
+            if(tag.length > 0){
+                const duplicate_tag = await managerDomain.duplicateTag(manager, payload);
+                if(duplicate_tag.length === 0 || duplicate_tag[0].index == user_index){
+                    await managerDomain.updateUser(manager, payload);
+                    await manager.query("COMMIT");
+                    res.status(200).json({
+                        message: "Update user is success"
+                    });
+                }else{
+                    res.status(400).json({
+                        message: "Duplicate tag!"
+                    });
+                }
             }else{
                 res.status(400).json({
-                    message: "Duplicate tag!"
+                    message: "Tag not found!"
                 });
+            
             }
-        }else{
-            res.status(400).json({
-                message: "Tag not found!"
-            });
-        
         }
+
+        
     }catch(err){
         await manager.query('ROLLBACK');
         console.log(err);
@@ -306,6 +317,34 @@ managerController.deleteUser = async(req, res, next) => {
     }finally{
         await manager.release();
     }
+}
+
+managerController.uploadUsers = async(req, res, next) => {
+    const payload = req.body;
+    const manager = await pool.connect();
+
+    try{
+        await manager.query('BEGIN');
+        for (let i = 0 ; i < payload.length ; i++){
+
+            await managerDomain.uploadUsers(manager, payload[i]);
+        }
+        await manager.query('COMMIT');
+
+        res.status(200).json({
+            message: "Update users success"
+        });
+
+    }catch(err){
+        await manager.query('ROLLBACK');
+        console.log(err);
+        res.status(500).json({
+            message: "Upload users is error"
+        });
+    }finally{
+        await manager.release();
+    }
+
 }
 
 //---Gate---//

@@ -106,12 +106,15 @@ managerDomain.deleteUserOfCompetition = async(manager, competition_index) => {
 
 managerDomain.addUser = async(manager, payload) => {
     try{
+
+        if(payload.gender === undefined){
+            payload.gender = "N/A"
+        }
+
         if(payload.tag_name === undefined){
-            payload.tag_name = null
+            payload.tag_name = "Not Defined"
         }
-        if(payload.status === undefined){
-            payload.status = "Pending"
-        }
+
         await manager.query(`
             INSERT INTO "user" (competition_index, name_title, first_name, last_name, gender, tag_name, status)
             VALUES (${payload.competition_index}, '${payload.name_title}', '${payload.first_name}', 
@@ -215,6 +218,27 @@ managerDomain.duplicateTag = async(manager, payload) => {
         `);
         return  duplicate_tag.rows;
     }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.uploadUsers = async(manager, payload) => {
+    try{
+        if(payload.gender === undefined){
+            payload.gender = "N/A"
+        }
+
+        if(payload.tag_name === undefined){
+            payload.tag_name = "Not Defined"
+        }
+
+        await manager.query(`
+            INSERT INTO "user" (competition_index, name_title, first_name, last_name, gender, tag_name, status)
+            VALUES (${payload.competition_index}, '${payload.name_title}', '${payload.first_name}', 
+                    '${payload.last_name}', '${payload.gender}', '${payload.tag_name}', 
+                    '${payload.status}')
+        `);
+    }catch(err){  
         throw err;
     }
 }

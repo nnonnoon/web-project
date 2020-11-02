@@ -14,6 +14,7 @@ router.get("/fetchUser/:user_index", managerController.fetchUser);
 router.get("/fetchAllUser/:competition_index", managerController.fetchAllUser);
 router.patch("/updateUser/:user_index", managerController.updateUser);
 router.delete("/deleteUser/:user_index", managerController.deleteUser);
+router.post("/uploadUsers", managerController.uploadUsers);
 
 router.post("/addGate", managerController.addGate);
 router.post("/fetchGate/:gate_index", managerController.fetchGate);
