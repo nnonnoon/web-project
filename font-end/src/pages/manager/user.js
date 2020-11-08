@@ -156,7 +156,10 @@ const MenuOption = styled.div`
     display:flex;
     flex-direction: column;
     align-items: center;
-    background: ${props => props.competition_name ? "#FF5050" : "#F9A826"};
+    background: ${props => props.competition_name ? "#FF5050" : 
+                props.menu_users ?  "#FF9D00" :
+                props.menu_gates ?  "#FF9D00" :
+                props.menu_start ?  "#FF9D00" : "#FFD085"};
     border-top-right-radius: 1rem;
     border-bottom-right-radius: 1rem;
     padding: 1rem;
@@ -217,6 +220,25 @@ const GateStyle = styled.div`
     }
 `
 
+const ButtonOfCompetition = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60%; 
+    width: 20%; 
+    font-size: 2rem;
+    background-color: ${ props => props.started ? "#58D1B4": props.pause ? "#FFBD52" : "#FF6666"}; 
+    color: white; 
+    border-radius: 2rem;
+    cursor: pointer;
+
+    :hover{
+        background: #E5E5E5;
+        border-color: white 1rem;
+        border-style: solid;
+    }
+`
+
 
 
 class user extends Component {
@@ -228,7 +250,6 @@ class user extends Component {
         this.fetchCompetition();
         this.fetchAllGate();
         this.state = {
-            isUserMode : true,
             competition_name: "",
             competition_index: "",
             nameTitle: "",
@@ -252,7 +273,17 @@ class user extends Component {
             used: "Not Used",
             disableAddGate: false,
             ableGate: true,
-            csvfile: undefined
+            csvfile: undefined,
+
+            menu_users: true,
+            menu_gates: false,
+            menu_start: false,
+
+            timerStarted: false,
+            timerPause: true,
+            hours: 0,
+            miniutes: 0,
+            seconds: 0
             
         }
         this.handleDel = this.handleDel.bind(this);
@@ -317,15 +348,27 @@ class user extends Component {
 //---Change_Mode---//  
 
     changeModeUser = () => {
-    this.setState({
-        isUserMode : true
-    });
+        this.setState({
+            menu_users: true,
+            menu_gates: false,
+            menu_start: false
+        });
     }
 
     changeModeGate = () => {
-    this.setState({
-        isUserMode : false
-    });
+        this.setState({
+            menu_users: false,
+            menu_gates: true,
+            menu_start: false
+        });
+    }
+
+    changeModeStart = () => {
+        this.setState({
+            menu_users: false,
+            menu_gates: false,
+            menu_start: true
+        });
     }
 
     handleMenuClick = (values) => {
@@ -557,6 +600,7 @@ class user extends Component {
 //---Gate_Delete---//
 
     showModalGateDel = (gateIndex) => {
+        console.log(gateIndex)
         this.setState({
             visibleGateDel: true,
             gateIndex: gateIndex
@@ -755,7 +799,41 @@ class user extends Component {
     //     });
     // }
 
+//---Timer---//
 
+    handelTimerStart(e){
+        e.preventDefault();
+
+        if(this.state.timerPause){
+            this.timer = setInterval(() => {
+                this.setState({timerStarted: true, timerPause: false})
+                if(this.state.timerStarted){
+                    if(this.state.seconds > 60){
+                        this.setState((prevState) => ({ miniutes: prevState.miniutes + 1, seconds: 0}))
+                    }
+                    if(this.state.miniutes > 60){
+                        this.setState((prevState) => ({ hours: prevState.hours + 1, miniutes: 0, seconds: 0}))
+                    }
+                    this.setState((prevState) => ({ seconds: prevState.seconds + 1}))
+                }
+            }, 1000)
+        }
+    }  
+    
+    handelTimerPause(e) {
+        e.preventDefault();
+
+        this.setState({timerStarted: false, timerPause: true});
+        clearInterval(this.timer);
+    }
+
+    handelTimerReset() {
+        this.setState({ timerStarted: false, timerPause: true, hours: 0, miniutes: 0, seconds: 0});
+        clearInterval(this.timer);
+    }
+
+
+//---Mode---//
 
     isUserMode = () => {
         return(
@@ -940,7 +1018,7 @@ class user extends Component {
         )
     }
 
-    isGatemode = () => {
+    isGateMode = () => {
         const menu = (
             <Menu onClick={this.changeUsed}>
                 <Menu.Item key="Used" >
@@ -1111,6 +1189,38 @@ class user extends Component {
         )
     }
 
+    isStartMode = () => {
+        return(
+            <ContainerDisplay>
+                <MediaQuery minDeviceWidth={680}>
+                    <ContainerOption >
+                            <div style={{fontSize: "2rem"}}>Start</div>
+                            <div style={{width: "2%"}}/>
+                            <div style={{fontSize: "2rem"}}>The</div>
+                            <div style={{width: "2%"}}/>
+                            <div style={{fontSize: "2rem"}}>Competition</div>
+                    </ContainerOption>
+
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "center" ,width: "100%", height: "80%"}}>
+                        <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
+                        <div style={{height: "60%", width: "5%"}}/>
+                        <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
+                        <div style={{height: "60%", width: "5%"}}/>
+                        <ButtonOfCompetition >End</ButtonOfCompetition>
+                    </div>
+
+                    <div style={{height: "10%"}}>
+                        {this.state.hours + ":" + this.state.miniutes + ":" + this.state.seconds}
+                    </div>
+
+                    <div onClick={this.handelTimerReset.bind(this)}>Reset</div>
+
+                </MediaQuery>
+            </ContainerDisplay>
+        );
+    } 
+
+//---Edit_Gates_Mode---//
 
     showGate = ()  => {
         return(
@@ -1125,7 +1235,7 @@ class user extends Component {
                             <GateStyle edit onClick = {() => this.showModalGateEdit(gate.index)}>
                                     <img src={edit} alt={edit}/>
                             </GateStyle>
-                            <GateStyle onClick={() => this.showModalDel(gate.index)} > 
+                            <GateStyle onClick={() => this.showModalGateDel(gate.index)} > 
                                     <img src={trashIcon} alt={trashIcon}/>
                             </GateStyle>
                         </ContainerAllGate>
@@ -1183,34 +1293,44 @@ class user extends Component {
         )
     }
 
+
+//---Main---//
     render() {
         return (
             <ContainerLayout>
                 <Navbar/>
                 <ContainerMenu>
-                    <MenuOption competition_name style={{ marginTop: '1.75rem',  width: '100%'}} onClick={this.changeModeUser}>
+                    <MenuOption competition_name style={{ marginTop: '1.75rem',  width: '100%'}}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.35rem', color: 'white'}} >
                             {this.state.competition_name}
                         </MenuTextStyled>
                     </MenuOption>
-                    <MenuOption style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
+                    <MenuOption menu_users={this.state.menu_users} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.25rem', color: 'white'}} >
                             Users
                         </MenuTextStyled>
                     </MenuOption>
 
-                    <MenuOption style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
+                    <MenuOption menu_gates={this.state.menu_gates} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
                                                 fontSize: '1.25rem', color: 'white'}}  
                         >
                             Gates
                         </MenuTextStyled>
                     </MenuOption>
+
+                    <MenuOption menu_start={this.state.menu_start} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeStart}>
+                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
+                                                fontSize: '1.25rem', color: 'white'}}  
+                        >
+                            Start 
+                        </MenuTextStyled>
+                    </MenuOption>
                 </ContainerMenu>
                     {
-                        this.state.isUserMode ? this.isUserMode() : this.isGatemode() 
+                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.isStartMode()
                     }
             </ContainerLayout>
         );
