@@ -1,8 +1,7 @@
-import { response } from 'express';
 import pool from '../../database/database'
 import managerDomain from '../../domain/manager/managerDomain'
 
-const managerController = {};
+const managerController = {}
 
 //---Competition---//
 
@@ -57,7 +56,7 @@ managerController.fetchCompetition = async(req, res, next) => {
             message: "Fetch competition error"
         });
     }finally{
-        await manager.release();
+        manager.release();
     }
 }
 
@@ -97,7 +96,7 @@ managerController.fetchAllCompetition = async(req, res, next) => {
             message: "Add competition error"
         });
     }finally{
-        await manager.release();
+        manager.release();
     }
 }
 
@@ -214,7 +213,6 @@ managerController.fetchUser = async(req, res, next) => {
 managerController.fetchAllUser = async(req, res, next) => {
     const { competition_index } = req.params;
     const manager = await pool.connect();
-
     try{
         await manager.query("BEGIN");
         const dataAllUser = await managerDomain.fetchAllUser(manager, competition_index);
@@ -232,7 +230,6 @@ managerController.fetchAllUser = async(req, res, next) => {
             payload.push(user);
         }
         await manager.query("COMMIT");
-
         res.status(200).json({
             user: payload
         });
@@ -243,7 +240,7 @@ managerController.fetchAllUser = async(req, res, next) => {
             message: "Fetch all user is error"
         });
     }finally{
-        await manager.release();
+        manager.release();
     }
 }
 

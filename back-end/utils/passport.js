@@ -28,6 +28,8 @@ passport.use(
             }
         }catch(err){
             done(err, null);
+        }finally{
+            auth.release();
         }
     }
 ));
