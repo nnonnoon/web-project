@@ -20,6 +20,7 @@ const ContainerOption = styled.div`
     display: flex;
     justify-content: center;
     padding-top: 3rem;
+    margin-bottom: 2rem;
 `
 const ContainerHeader = styled.div`
     display: flex;
@@ -180,6 +181,7 @@ const ContainerMenu = styled.div`
     display:flex;
     flex-direction: column;
     width: 20%;
+    height: auto;
 `
 
 const MenuTextStyled = styled.div``
@@ -224,10 +226,10 @@ const ButtonOfCompetition = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 60%; 
+    height: 80%; 
     width: 20%; 
     font-size: 2rem;
-    background-color: ${ props => props.started ? "#58D1B4": props.pause ? "#FFBD52" : "#FF6666"}; 
+    background-color: ${ props => props.started ? "#58D1B4": props.pause ? "#FFBD54" : props.reset? "#7FD2F8": "#FF6666"}; 
     color: white; 
     border-radius: 2rem;
     cursor: pointer;
@@ -1191,32 +1193,45 @@ class user extends Component {
 
     isStartMode = () => {
         return(
-            <ContainerDisplay>
-                <MediaQuery minDeviceWidth={680}>
-                    <ContainerOption >
-                            <div style={{fontSize: "2rem"}}>Start</div>
-                            <div style={{width: "2%"}}/>
-                            <div style={{fontSize: "2rem"}}>The</div>
-                            <div style={{width: "2%"}}/>
-                            <div style={{fontSize: "2rem"}}>Competition</div>
-                    </ContainerOption>
+            // <ContainerDisplay>
 
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center" ,width: "100%", height: "80%"}}>
-                        <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
-                        <div style={{height: "60%", width: "5%"}}/>
-                        <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
-                        <div style={{height: "60%", width: "5%"}}/>
-                        <ButtonOfCompetition >End</ButtonOfCompetition>
-                    </div>
-
-                    <div style={{height: "10%"}}>
-                        {this.state.hours + ":" + this.state.miniutes + ":" + this.state.seconds}
-                    </div>
-
-                    <div onClick={this.handelTimerReset.bind(this)}>Reset</div>
-
-                </MediaQuery>
-            </ContainerDisplay>
+                   <div style={{ width: "80%", height: "35rem", marginLeft: "5%"}}>
+                        {/* <MediaQuery minDeviceWidth={680}> */}
+                            <ContainerOption >
+                                    <div style={{fontSize: "2rem"}}>Start</div>
+                                    <div style={{width: "2%"}}/>
+                                    <div style={{fontSize: "2rem"}}>The</div>
+                                    <div style={{width: "2%"}}/>
+                                    <div style={{fontSize: "2rem"}}>Competition</div>
+                            </ContainerOption>
+        
+                            <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
+                                <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
+                                <div style={{height: "30%", width: "5%"}}/>
+                                <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
+                                <div style={{height: "30%", width: "5%"}}/>
+                                <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
+                                <div style={{height: "30%", width: "5%"}}/>
+                                <ButtonOfCompetition >End</ButtonOfCompetition>
+                            </div>
+                            
+                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
+                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "40%"}}>
+                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#58D1B4", color: "black"}}>
+                                        {this.state.hours + " H" }
+                                </div>
+                                <div style={{height: "30%", width: "5%"}}/>
+                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FFD085",  color: "black"}}>
+                                        {this.state.miniutes + " M"} 
+                                </div>
+                                <div style={{height: "30%", width: "5%"}}/>
+                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FF7D7D",  color: "black"}}>
+                                        { this.state.seconds + " S"}                                    
+                                </div>
+                           </div>
+                        {/* </MediaQuery> */}
+                   </div>
+            // </ContainerDisplay>
         );
     } 
 
@@ -1328,9 +1343,10 @@ class user extends Component {
                             Start 
                         </MenuTextStyled>
                     </MenuOption>
+
                 </ContainerMenu>
                     {
-                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.isStartMode()
+                        this.state.menu_users ? this.isStartMode() : this.state.menu_gates ? this.isGateMode() : this.isUserMode()
                     }
             </ContainerLayout>
         );
