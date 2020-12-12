@@ -1,5 +1,4 @@
 import React, { Component  } from 'react';
-import Navbar from '../component/navbar';
 import MediaQuery from "react-responsive";
 import { Button, Modal, Form, Input, message,  Dropdown, Menu } from 'antd';
 import { manager } from '../../services/api'
@@ -810,13 +809,14 @@ class user extends Component {
             this.timer = setInterval(() => {
                 this.setState({timerStarted: true, timerPause: false})
                 if(this.state.timerStarted){
-                    if(this.state.seconds > 60){
-                        this.setState((prevState) => ({ miniutes: prevState.miniutes + 1, seconds: 0}))
+                    if(this.state.seconds >= 59){
+                        this.setState((prevState) => ({ miniutes: prevState.miniutes + 1, seconds: -1}))
                     }
-                    if(this.state.miniutes > 60){
-                        this.setState((prevState) => ({ hours: prevState.hours + 1, miniutes: 0, seconds: 0}))
+                    if(this.state.miniutes >= 59){
+                        this.setState((prevState) => ({ hours: prevState.hours + 1, miniutes: -1, seconds: -1}))
+                    }else{
+                        this.setState((prevState) => ({ seconds: prevState.seconds + 1}))
                     }
-                    this.setState((prevState) => ({ seconds: prevState.seconds + 1}))
                 }
             }, 1000)
         }
@@ -1198,11 +1198,11 @@ class user extends Component {
                    <div style={{ width: "80%", height: "35rem", marginLeft: "5%"}}>
                         {/* <MediaQuery minDeviceWidth={680}> */}
                             <ContainerOption >
-                                    <div style={{fontSize: "2rem"}}>Start</div>
+                                    <div style={{fontSize: "3rem"}}>Start</div>
                                     <div style={{width: "2%"}}/>
-                                    <div style={{fontSize: "2rem"}}>The</div>
+                                    <div style={{fontSize: "3rem"}}>The</div>
                                     <div style={{width: "2%"}}/>
-                                    <div style={{fontSize: "2rem"}}>Competition</div>
+                                    <div style={{fontSize: "3rem"}}>Competition</div>
                             </ContainerOption>
         
                             <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
@@ -1313,7 +1313,6 @@ class user extends Component {
     render() {
         return (
             <ContainerLayout>
-                <Navbar/>
                 <ContainerMenu>
                     <MenuOption competition_name style={{ marginTop: '1.75rem',  width: '100%'}}>
                         <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  

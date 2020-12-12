@@ -3,7 +3,9 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import { subDomain, redirectTo } from './services/redirect';
 import Login from './pages/login';
 import Competition from './pages/manager/competition';
-import User from './pages/manager/user'
+import Tags from './pages/manager/Tags';
+import User from './pages/manager/user';
+import Navbar from './pages/component/navbar';
 import './App.css';
 
 const signedIn = localStorage.getItem("access-token") && localStorage.getItem("refresh-token");
@@ -31,19 +33,25 @@ function App() {
     return (
       <BrowserRouter>
         <div className="App">
-              <Switch>
-                <Mainroute signedIn={signedIn} exact path={`/`} />
-                <Privateroute
-                  issignedIn={signedIn}
-                  exact path={`${subDomain}/competition`}
-                  component={Competition}
-                />
-                <Privateroute
-                  issignedIn={signedIn}
-                  exact path={`${subDomain}/competition/index=:competition_index`}
-                  component={User}
-                />
-              </Switch>
+          <Navbar/>
+          <Switch>
+            <Mainroute signedIn={signedIn} exact path={`/`} />
+            <Privateroute
+              issignedIn={signedIn}
+              exact path={`${subDomain}/competition`}
+              component={Competition}
+            />
+            <Privateroute
+              issignedIn={signedIn}
+              exact path={`${subDomain}/tags`}
+              component={Tags}
+            />
+            <Privateroute
+              issignedIn={signedIn}
+              exact path={`${subDomain}/competition/index=:competition_index`}
+              component={User}
+            />
+          </Switch>
         </div>
       </BrowserRouter>
     );

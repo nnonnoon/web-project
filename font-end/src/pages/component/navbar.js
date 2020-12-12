@@ -4,6 +4,7 @@ import MediaQuery from "react-responsive";
 import { redirectTo } from "../../services/redirect";
 import { message, Button } from "antd";
 import { subDomain } from '../../services/redirect'
+import { NavLink } from "react-router-dom";
 
 const Bar = styled.div`
     position: fixed;
@@ -14,7 +15,7 @@ const Bar = styled.div`
     height: 3.5rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     z-index: 900;
     padding-left: 10%;
     padding-right: 10%;
@@ -32,6 +33,7 @@ const Text = styled.div`
 const List = styled.div`
     display: flex;
     align-items: center;
+    width: 5%;
 `
 
 const ButtonStyled = styled(Button)`
@@ -52,6 +54,32 @@ const ButtonStyled = styled(Button)`
     }
 `
 
+const Link = styled.div`
+    display: flex;
+    align-items: flex-start;
+    width: 90%;
+`
+
+const ListStyled = styled(NavLink)`
+    display:flex;
+    font-family: "Roboto";
+    color: #ffffff;
+    margin-top: 8px;
+    font-size: 22px;
+    width: 15%;
+    &.active,
+    &:hover{
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: underline
+    }
+`
+
+const Space = styled.div`
+    width: ${props => props.little ? "10%" : "20%"};
+`
+
 
 
 class navbar extends Component {
@@ -69,18 +97,20 @@ class navbar extends Component {
         }, secondsToGo * 500);
     }
 
-    handleRefresh() {
-        window.location = `${subDomain}/competition`
-    }
-
-
     render() {
         return (
             <Bar>
                 <MediaQuery minDeviceWidth={680}>
                     <List>
-                        <Text onClick= {this.handleRefresh}>Running</Text>
+                        <Text onClick= {this.handleLinkCompetition}>Running</Text>
                     </List>
+                    <Space/>
+                    <Link>
+                        <ListStyled to={`${subDomain}/competition`}>Competition</ListStyled>
+                        <Space little/>
+                        <ListStyled to={`${subDomain}/tags`}>Tags</ListStyled>
+                    </Link>
+                    <Space/>
                     <List>
                         <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
                     </List>
