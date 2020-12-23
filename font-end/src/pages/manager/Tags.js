@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Tags(props) {
+function tags(props) {
     return (
         <>
             <div style={{fontSize: "10rem"}}>hello</div>
@@ -8,4 +8,4 @@ function Tags(props) {
     );
 }
 
-export default Tags;
+export default tags;

@@ -62,25 +62,27 @@ const Link = styled.div`
 
 const ListStyled = styled(NavLink)`
     display:flex;
+    justify-content: center;
     font-family: "Roboto";
-    color: #ffffff;
-    margin-top: 8px;
-    font-size: 22px;
-    width: 15%;
-    &.active,
+    color: black;
+    font-size: 1.3rem;
+    font-weight: 500;
+    border-radius: 5px;
+    width: 20%;
+    &.active{
+        background: white;
+        font-weight: 800;
+    }
     &:hover{
         color: black;
-        font-weight: bold;
+        font-weight: 800;
         cursor: pointer;
-        text-decoration: underline
     }
 `
 
 const Space = styled.div`
-    width: ${props => props.little ? "10%" : "20%"};
+    width: ${props => props.space};
 `
-
-
 
 class navbar extends Component {
 
@@ -104,13 +106,13 @@ class navbar extends Component {
                     <List>
                         <Text onClick= {this.handleLinkCompetition}>Running</Text>
                     </List>
-                    <Space/>
+                    <Space space ="20%"/>
                     <Link>
                         <ListStyled to={`${subDomain}/competition`}>Competition</ListStyled>
-                        <Space little/>
+                        <Space space ="5%"/>
                         <ListStyled to={`${subDomain}/tags`}>Tags</ListStyled>
                     </Link>
-                    <Space/>
+                    <Space  space ="20%"/>
                     <List>
                         <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
                     </List>

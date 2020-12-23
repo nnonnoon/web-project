@@ -8,10 +8,13 @@ import trashIcon from '../../assets/icon/bin.svg'
 import trash_comfirm from '../../assets/icon/trash_comfirm.svg'
 import { DownOutlined } from '@ant-design/icons';
 import ReactFileReader from 'react-file-reader';
+import userImg from '../../assets/icon/user.svg';
+import antenna from '../../assets/icon/antenna.svg';
+import start from '../../assets/icon/start.svg';
+import results from '../../assets/icon/results.svg';
 
 const ContainerLayout = styled.div`
     display: flex;
-    position: relative;
     padding: 3.5rem 5% 0 0;
     height: 100%;
 `
@@ -154,36 +157,41 @@ const ContainerPicture = styled.div`
 
 const MenuOption = styled.div`
     display:flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    background: ${props => props.competition_name ? "#FF5050" : 
-                props.menu_users ?  "#FF9D00" :
-                props.menu_gates ?  "#FF9D00" :
-                props.menu_start ?  "#FF9D00" : "#FFD085"};
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    margin-bottom: ${(props) => props.marginBottom};
+    background: ${props => props.competition_name ? "#606060" : 
+                props.menu_users ?  "#909090" :
+                props.menu_gates ?  "#909090" :
+                props.menu_start ?  "#909090" : "#C4C4C4"};
+    color: ${props => props.competition_name ? "white" : 
+                props.menu_users ?  "white" :
+                props.menu_gates ?  "white" :
+                props.menu_start ?  "white" : "black"};
+    font-size: ${(props) => props.fontSize};
+    font-weight: 600;
     padding: 1rem;
     cursor: ${props => props.competition_name ? "" : "pointer"};
     :hover{
-        background: ${props => props.competition_name ? "" : "#FF9D00"};
+        color: ${props => props.competition_name ? "" : "white"} 
     }
 `
 
 const ContainerDisplay = styled.div`
     display:flex;
     flex-direction: column;
-    margin-left: 5%;
+    margin-left: 25%;
     width: 80%;
 `
 
 const ContainerMenu = styled.div`
     display:flex;
+    position: fixed;
     flex-direction: column;
     width: 20%;
-    height: auto;
+    height: 100%;
+    background: #C4C4C4;
 `
-
-const MenuTextStyled = styled.div``
 
 const ContainerConfigGate = styled.div`
     display: flex;
@@ -239,7 +247,6 @@ const ButtonOfCompetition = styled.div`
         border-style: solid;
     }
 `
-
 
 
 class user extends Component {
@@ -1193,45 +1200,43 @@ class user extends Component {
 
     isStartMode = () => {
         return(
-            // <ContainerDisplay>
 
-                   <div style={{ width: "80%", height: "35rem", marginLeft: "5%"}}>
-                        {/* <MediaQuery minDeviceWidth={680}> */}
-                            <ContainerOption >
-                                    <div style={{fontSize: "3rem"}}>Start</div>
-                                    <div style={{width: "2%"}}/>
-                                    <div style={{fontSize: "3rem"}}>The</div>
-                                    <div style={{width: "2%"}}/>
-                                    <div style={{fontSize: "3rem"}}>Competition</div>
-                            </ContainerOption>
-        
-                            <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
-                                <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
-                                <div style={{height: "30%", width: "5%"}}/>
-                                <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
-                                <div style={{height: "30%", width: "5%"}}/>
-                                <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
-                                <div style={{height: "30%", width: "5%"}}/>
-                                <ButtonOfCompetition >End</ButtonOfCompetition>
-                            </div>
-                            
-                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
-                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "40%"}}>
-                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#58D1B4", color: "black"}}>
-                                        {this.state.hours + " H" }
-                                </div>
-                                <div style={{height: "30%", width: "5%"}}/>
-                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FFD085",  color: "black"}}>
-                                        {this.state.miniutes + " M"} 
-                                </div>
-                                <div style={{height: "30%", width: "5%"}}/>
-                                <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FF7D7D",  color: "black"}}>
-                                        { this.state.seconds + " S"}                                    
-                                </div>
-                           </div>
-                        {/* </MediaQuery> */}
-                   </div>
-            // </ContainerDisplay>
+            <div style={{ width: "80%", height: "35rem", marginLeft: "25%"}}>
+                <MediaQuery minDeviceWidth={680}>
+                    <ContainerOption >
+                            <div style={{fontSize: "3rem"}}>Start</div>
+                            <div style={{width: "2%"}}/>
+                            <div style={{fontSize: "3rem"}}>The</div>
+                            <div style={{width: "2%"}}/>
+                            <div style={{fontSize: "3rem"}}>Competition</div>
+                    </ContainerOption>
+
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
+                        <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
+                        <div style={{height: "30%", width: "5%"}}/>
+                        <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
+                        <div style={{height: "30%", width: "5%"}}/>
+                        <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
+                        <div style={{height: "30%", width: "5%"}}/>
+                        <ButtonOfCompetition >End</ButtonOfCompetition>
+                    </div>
+                    
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "40%"}}>
+                        <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#58D1B4", color: "black"}}>
+                                {this.state.hours + " H" }
+                        </div>
+                        <div style={{height: "30%", width: "5%"}}/>
+                        <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FFD085",  color: "black"}}>
+                                {this.state.miniutes + " M"} 
+                        </div>
+                        <div style={{height: "30%", width: "5%"}}/>
+                        <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FF7D7D",  color: "black"}}>
+                                { this.state.seconds + " S"}                                    
+                        </div>
+                    </div>
+                </MediaQuery>
+            </div>
         );
     } 
 
@@ -1314,33 +1319,22 @@ class user extends Component {
         return (
             <ContainerLayout>
                 <ContainerMenu>
-                    <MenuOption competition_name style={{ marginTop: '1.75rem',  width: '100%'}}>
-                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
-                                                fontSize: '1.35rem', color: 'white'}} >
-                            {this.state.competition_name}
-                        </MenuTextStyled>
+                    <MenuOption competition_name marginBottom="1.75" fontSize="1.75rem"> 
+                        {this.state.competition_name}
                     </MenuOption>
-                    <MenuOption menu_users={this.state.menu_users} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeUser}>
-                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
-                                                fontSize: '1.25rem', color: 'white'}} >
-                            Users
-                        </MenuTextStyled>
+                    <MenuOption menu_users={this.state.menu_users}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeUser}>
+                            <img src={userImg} alt={userImg} style={{marginRight: "5%"}}/> Users
                     </MenuOption>
 
-                    <MenuOption menu_gates={this.state.menu_gates} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeGate}>
-                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
-                                                fontSize: '1.25rem', color: 'white'}}  
-                        >
-                            Gates
-                        </MenuTextStyled>
+                    <MenuOption menu_gates={this.state.menu_gates} marginBottom="2" fontSize="1.25rem" onClick={this.changeModeGate}>
+                        <img src={antenna} alt={antenna} style={{marginRight: "5%"}}/> Gates
                     </MenuOption>
 
-                    <MenuOption menu_start={this.state.menu_start} style={{ marginTop: '2rem',  width: '70%'}} onClick={this.changeModeStart}>
-                        <MenuTextStyled style={{ fontFamily: "Roboto", width: '100%' , fontWeight: 'bold',  
-                                                fontSize: '1.25rem', color: 'white'}}  
-                        >
-                            Start 
-                        </MenuTextStyled>
+                    <MenuOption menu_start={this.state.menu_start} marginBottom="2" fontSize="1.25rem" onClick={this.changeModeStart}>
+                        <img src={start} alt={start} style={{marginRight: "5%"}}/> Start 
+                    </MenuOption>
+                    <MenuOption  marginBottom="2" fontSize="1.25rem" >
+                        <img src={results} alt={results} style={{marginRight: "5%"}}/> Result 
                     </MenuOption>
 
                 </ContainerMenu>

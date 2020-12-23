@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import { subDomain, redirectTo } from './services/redirect';
 import Login from './pages/login';
 import Competition from './pages/manager/competition';
-import Tags from './pages/manager/Tags';
-import User from './pages/manager/user';
+import Tags from './pages/manager/tags';
+import User from './pages/manager/detail';
 import Navbar from './pages/component/navbar';
 import './App.css';
 
