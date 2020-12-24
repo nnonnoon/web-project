@@ -391,12 +391,12 @@ class competition extends Component {
                     </ContainerOption>
                     <ContainerTable>
                         <HeaderText  header small>No.</HeaderText>
-                        <HeaderText  header location style={{paddingLeft: "20px"}}>Competition name</HeaderText>
-                        <HeaderText  header big style={{paddingLeft: "18px"}}>Location</HeaderText>
-                        <HeaderText  header style={{paddingLeft: "27px"}}>Date</HeaderText>
-                        <HeaderText  header style={{paddingLeft: "28px"}}>Time</HeaderText>
-                        <HeaderText  header style={{paddingLeft: "50px"}}>Manager</HeaderText>
-                        <HeaderText  header style={{paddingLeft: "20px"}}>Delete</HeaderText>
+                        <HeaderText  header location style={{paddingLeft: "3%"}}>Competition name</HeaderText>
+                        <HeaderText  header big style={{paddingLeft: "3%"}}>Location</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "3%"}}>Date</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "3%"}}>Time</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "3%"}}>Manager</HeaderText>
+                        <HeaderText  header style={{paddingLeft: "3%"}}>Delete</HeaderText>
                     </ContainerTable>
                     <ContainerItems>
                         {

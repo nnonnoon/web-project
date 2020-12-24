@@ -30,12 +30,6 @@ const Text = styled.div`
     cursor: pointer;
 `
 
-const List = styled.div`
-    display: flex;
-    align-items: center;
-    width: 5%;
-`
-
 const ButtonStyled = styled(Button)`
     display:flex;
     align-items: center;
@@ -54,24 +48,20 @@ const ButtonStyled = styled(Button)`
     }
 `
 
-const Link = styled.div`
-    display: flex;
-    align-items: flex-start;
-    width: 90%;
-`
-
 const ListStyled = styled(NavLink)`
     display:flex;
     justify-content: center;
     font-family: "Roboto";
     color: black;
-    font-size: 1.3rem;
+    font-size: 150%;
     font-weight: 500;
     border-radius: 5px;
-    width: 20%;
+    min-width: 150px;
+    max-width: 220px;
     &.active{
         background: white;
-        font-weight: 800;
+        font-weight: 800 ;
+        position: relative;
     }
     &:hover{
         color: black;
@@ -103,19 +93,13 @@ class navbar extends Component {
         return (
             <Bar>
                 <MediaQuery minDeviceWidth={680}>
-                    <List>
-                        <Text onClick= {this.handleLinkCompetition}>Running</Text>
-                    </List>
-                    <Space space ="20%"/>
-                    <Link>
-                        <ListStyled to={`${subDomain}/competition`}>Competition</ListStyled>
-                        <Space space ="5%"/>
-                        <ListStyled to={`${subDomain}/tags`}>Tags</ListStyled>
-                    </Link>
-                    <Space  space ="20%"/>
-                    <List>
-                        <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
-                    </List>
+                    <Text onClick= {this.handleLinkCompetition}>Running</Text>
+                    <Space space ="10%"/>
+                    <ListStyled to={`${subDomain}/competition`}>Competition</ListStyled>
+                    <Space space ="2%"/>
+                    <ListStyled to={`${subDomain}/tags`}>Tags</ListStyled>
+                    <Space  space ="60%"/>
+                    <ButtonStyled onClick= {this.handleLogout}>Logout</ButtonStyled>
                 </MediaQuery>
             </Bar>
         );
