@@ -1339,7 +1339,7 @@ class user extends Component {
 
                 </ContainerMenu>
                     {
-                        this.state.menu_users ? this.isStartMode() : this.state.menu_gates ? this.isGateMode() : this.isUserMode()
+                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.isStartMode()
                     }
             </ContainerLayout>
         );
