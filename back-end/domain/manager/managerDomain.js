@@ -249,7 +249,7 @@ managerDomain.tag = async(manager, tag_name) => {
     try{
         const tag = await manager.query(`
             SELECT index, tag_name, tag_number
-            FROM "tag"
+            FROM "tags"
             WHERE tag_name = '${tag_name}'
         `);
         return tag.rows;
