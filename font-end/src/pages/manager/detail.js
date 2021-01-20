@@ -16,7 +16,7 @@ import results from '../../assets/icon/results.svg';
 const ContainerLayout = styled.div`
     display: flex;
     padding: 3.5rem 5% 0 0;
-    height: 100%;
+    height: 100vh;
 `
 const ContainerOption = styled.div`
     display: flex;
@@ -163,11 +163,13 @@ const MenuOption = styled.div`
     background: ${props => props.competition_name ? "#606060" : 
                 props.menu_users ?  "#909090" :
                 props.menu_gates ?  "#909090" :
-                props.menu_start ?  "#909090" : "#C4C4C4"};
+                props.menu_start ?  "#909090" : 
+                props.menu_result ? "#909090" : "#C4C4C4"};
     color: ${props => props.competition_name ? "white" : 
                 props.menu_users ?  "white" :
                 props.menu_gates ?  "white" :
-                props.menu_start ?  "white" : "black"};
+                props.menu_start ?  "white" : 
+                props.menu_result ? "white" : "black"};
     font-size: ${(props) => props.fontSize};
     font-weight: 600;
     padding: 1rem;
@@ -286,6 +288,7 @@ class user extends Component {
             menu_users: true,
             menu_gates: false,
             menu_start: false,
+            menu_result: false,
 
             timerStarted: false,
             timerPause: true,
@@ -359,7 +362,8 @@ class user extends Component {
         this.setState({
             menu_users: true,
             menu_gates: false,
-            menu_start: false
+            menu_start: false,
+            menu_result: false
         });
     }
 
@@ -367,7 +371,8 @@ class user extends Component {
         this.setState({
             menu_users: false,
             menu_gates: true,
-            menu_start: false
+            menu_start: false,
+            menu_result: false
         });
     }
 
@@ -375,7 +380,17 @@ class user extends Component {
         this.setState({
             menu_users: false,
             menu_gates: false,
-            menu_start: true
+            menu_start: true,
+            menu_result: false
+        });
+    }
+
+    changeModeResult = () => {
+        this.setState({
+            menu_users: false,
+            menu_gates: false,
+            menu_start: false,
+            menu_result: true
         });
     }
 
@@ -1240,6 +1255,19 @@ class user extends Component {
         );
     } 
 
+    isResultMode = () => {
+        return (
+            <div style={{ width: "80%", marginLeft: "25%"}}>
+                <MediaQuery minDeviceWidth={680}>
+                    <ContainerOption >
+                            <div style={{fontSize: "3rem"}}>Result</div>
+                    </ContainerOption>
+                </MediaQuery>
+            </div>
+        );
+    }
+
+
 //---Edit_Gates_Mode---//
 
     showGate = ()  => {
@@ -1333,13 +1361,13 @@ class user extends Component {
                     <MenuOption menu_start={this.state.menu_start} marginBottom="2" fontSize="1.25rem" onClick={this.changeModeStart}>
                         <img src={start} alt={start} style={{marginRight: "5%"}}/> Start 
                     </MenuOption>
-                    <MenuOption  marginBottom="2" fontSize="1.25rem" >
+                    <MenuOption menu_result={this.state.menu_result}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeResult}>
                         <img src={results} alt={results} style={{marginRight: "5%"}}/> Result 
                     </MenuOption>
 
                 </ContainerMenu>
                     {
-                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.isStartMode()
+                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.state.menu_start ? this.isStartMode() : this.isResultMode() 
                     }
             </ContainerLayout>
         );

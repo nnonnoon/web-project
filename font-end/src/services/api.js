@@ -15,6 +15,15 @@ const managerApi = axios.create({
     },
 });
 
+
+const tagsApi = axios.create({
+    baseURL: 'http://localhost:3001/api/tags',
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+    },
+});
+
 export const authentication = {
     Login: (payload, callback, onRejected) => 
         commonApi
@@ -114,4 +123,18 @@ export const manager = {
             .post(`/checkGateIP`, payload)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
-}
+};
+
+export const tags_backend = {
+    fetchTags: (callback, onRejected) =>
+        tagsApi
+            .get('/fetchTags')
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
+    
+    addTags: (payload, callback, onRejected) =>
+        tagsApi
+            .post('/addTags', payload)
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
+};
