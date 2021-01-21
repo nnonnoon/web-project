@@ -1,7 +1,7 @@
 import React, { Component  } from 'react';
 import MediaQuery from "react-responsive";
 import { Button, Modal, Form, Input, message,  Dropdown, Menu } from 'antd';
-import { manager } from '../../services/api'
+import { manager, results_api } from '../../services/api'
 import styled from 'styled-components'
 import edit from '../../assets/icon/edit.svg'
 import trashIcon from '../../assets/icon/bin.svg'
@@ -86,7 +86,7 @@ const ContainerTable = styled.div`
     display: flex;
     margin-top: 2rem;
     height: 2.5rem;
-    background: #E6E6E6;
+    background: ${props => props.result ? "#FFA378" : "#E6E6E6"};
 `
 
 const HeaderText = styled.div`
@@ -251,6 +251,7 @@ const ButtonOfCompetition = styled.div`
 `
 
 
+
 class user extends Component {
     formRef = React.createRef();
 
@@ -259,6 +260,7 @@ class user extends Component {
         this.fetchAllUser();
         this.fetchCompetition();
         this.fetchAllGate();
+        this.fetchResults();
         this.state = {
             competition_name: "",
             competition_index: "",
@@ -274,6 +276,7 @@ class user extends Component {
             userIndex: "",
             user: [],
             gate: [],
+            results: [],
             visibleGate: false,
             visibleGateEdit: false,
             visibleGateDel: false,
@@ -346,6 +349,25 @@ class user extends Component {
             ({ data }) => {
                 this.setState({
                     gate: data.gate
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+//---Fetch_Result---//
+    fetchResults() {
+        let competition_index = window.location.pathname.split("=")[1];
+        results_api.fetchResult(
+            competition_index,
+            ({ data }) => {
+                console.log(data.results)
+                this.setState({
+                    results: data.results
                 });
             },
             (response) => {
@@ -1260,8 +1282,36 @@ class user extends Component {
             <div style={{ width: "80%", marginLeft: "25%"}}>
                 <MediaQuery minDeviceWidth={680}>
                     <ContainerOption >
-                            <div style={{fontSize: "3rem"}}>Result</div>
+                            <div style={{fontSize: "3rem"}}>Results</div>
                     </ContainerOption>
+                    <ContainerTable result>
+                        <HeaderText  header >No.</HeaderText>
+                        <HeaderText  header >Name title</HeaderText>
+                        <HeaderText  header big>First name</HeaderText>
+                        <HeaderText  header >Last name</HeaderText>
+                        <HeaderText  header >Gender</HeaderText>
+                        <HeaderText  header small>Round Total</HeaderText>
+                        <HeaderText  header >Times Total (min.)</HeaderText>
+                    </ContainerTable>
+                    <ContainerItems>
+                        {
+                            this.state.results.map((results, index) => {
+                                return(
+                                    <ContainerAllItems>
+                                        <CompetitionStyled key={index+1}>
+                                            <HeaderText item style={{paddingRight: "10px"}}>{index+1}</HeaderText>
+                                            <HeaderText item >{results.name_title}</HeaderText>
+                                            <HeaderText item big >{results.first_name}</HeaderText>
+                                            <HeaderText item >{results.last_name}</HeaderText>
+                                            <HeaderText item >{results.gender}</HeaderText>
+                                            <HeaderText item small>{results.round_total}</HeaderText>
+                                            <HeaderText item >{results.times_total}</HeaderText>
+                                        </CompetitionStyled>
+                                    </ContainerAllItems>
+                                )
+                            })
+                        }
+                    </ContainerItems>
                 </MediaQuery>
             </div>
         );
@@ -1362,7 +1412,7 @@ class user extends Component {
                         <img src={start} alt={start} style={{marginRight: "5%"}}/> Start 
                     </MenuOption>
                     <MenuOption menu_result={this.state.menu_result}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeResult}>
-                        <img src={results} alt={results} style={{marginRight: "5%"}}/> Result 
+                        <img src={results} alt={results} style={{marginRight: "5%"}}/> Results 
                     </MenuOption>
 
                 </ContainerMenu>

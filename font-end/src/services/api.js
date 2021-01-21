@@ -24,6 +24,16 @@ const tagsApi = axios.create({
     },
 });
 
+
+const loggingApi = axios.create({
+    baseURL: 'http://localhost:3001/api/logging',
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+    },
+});
+
+
 export const authentication = {
     Login: (payload, callback, onRejected) => 
         commonApi
@@ -135,6 +145,14 @@ export const tags_backend = {
     addTags: (payload, callback, onRejected) =>
         tagsApi
             .post('/addTags', payload)
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
+};
+
+export const results_api = {
+    fetchResult: (competition_index, callback, onRejected) =>
+        loggingApi
+            .get(`/fetchResult/${competition_index}`)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
 };
