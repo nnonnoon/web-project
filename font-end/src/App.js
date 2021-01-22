@@ -6,6 +6,7 @@ import Competition from './pages/manager/competition';
 import Tags from './pages/manager/tags';
 import User from './pages/manager/detail';
 import Navbar from './pages/component/navbar';
+import resultDetail from './pages/manager/resultDetail';
 import './App.css';
 
 const signedIn = localStorage.getItem("access-token") && localStorage.getItem("refresh-token");
@@ -48,8 +49,13 @@ function App() {
             />
             <Privateroute
               issignedIn={signedIn}
-              exact path={`${subDomain}/competition/index=:competition_index`}
+              exact path={`${subDomain}/competition/:competition_index`}
               component={User}
+            />
+            <Privateroute
+              issignedIn={signedIn}
+              exact path={`${subDomain}/competition/:competition_index/user=:resultsIndex`}
+              component={resultDetail}
             />
           </Switch>
         </div>

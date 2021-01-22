@@ -281,7 +281,7 @@ class competition extends Component {
     }
 
     handleLinkPage = (competition_index) => {
-        window.location = `${subDomain}/competition/index=${competition_index}`
+        window.location = `${subDomain}/competition/${competition_index}`
     }
       
     render() {

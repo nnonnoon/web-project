@@ -12,6 +12,8 @@ import userImg from '../../assets/icon/user.svg';
 import antenna from '../../assets/icon/antenna.svg';
 import start from '../../assets/icon/start.svg';
 import results from '../../assets/icon/results.svg';
+import icon_detail from '../../assets/icon/icon_detail.svg';
+import { subDomain } from '../../services/redirect'
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -93,14 +95,26 @@ const HeaderText = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width:  ${props => props.small? "12%": props.big? "20%": "16%"};;
-    font-size: ${props => props.header? "16px": "14px"};
-    font-weight: ${props => props.header? "bold": ""};
+    width:  ${props => props.small? "12%": props.big? "20%": "16%"};
+    font-size: ${props => props.header? "16px":  "14px"};
+    font-weight: ${props => props.header? "bold":  ""};
     border-bottom: ${props => props.item? "3px solid #E6E6E6": null};
     color: ${props => props.pendding ? "orange": props.pass ? "#10CC9F" :  props.notPass ? "red" : "black"  };
     cursor: ${props => props.option? "pointer": ""};
     :hover{
         background: ${props => props.edit? "#FFD085" : props.del ? "#FFB5B5": ""};
+    }
+`
+
+const IconDetail = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width:  10%;
+    border-bottom: 3px solid #E6E6E6;
+    cursor: pointer;
+    :hover{
+        background: #D8B0FF;
     }
 `
 
@@ -306,7 +320,7 @@ class user extends Component {
 //---Fetch_Competition---//
 
     fetchCompetition() {
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         manager.fetchCompetition(
             competition_index,
             ({ data }) => {
@@ -325,7 +339,7 @@ class user extends Component {
 
 //---Fetch_User---//
     fetchAllUser () {
-    let competition_index = window.location.pathname.split("=")[1];
+    let competition_index = window.location.pathname.split("/")[2];
         manager.fetchAllUser(
             competition_index,
             ({ data }) => {
@@ -343,7 +357,7 @@ class user extends Component {
     
 //---Fetch_Gate---//
     fetchAllGate() {
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         manager.fetchAllGate(
             competition_index,
             ({ data }) => {
@@ -361,7 +375,7 @@ class user extends Component {
 
 //---Fetch_Result---//
     fetchResults() {
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         results_api.fetchResult(
             competition_index,
             ({ data }) => {
@@ -442,7 +456,7 @@ class user extends Component {
     }
 
     handleAddUser(){
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         const payload = {
             competition_index: competition_index,
             name_title: this.state.nameTitle,
@@ -518,7 +532,7 @@ class user extends Component {
 
     updateUser(){
         let user_index = this.state.userIndex;
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         console.log(user_index)
         const payload = {
             competition_index: competition_index,
@@ -616,7 +630,7 @@ class user extends Component {
         
                 for(var j=0;j<headers.length;j++){
                     obj[headers[j]] = currentline[j];
-                    obj["competition_index"] = window.location.pathname.split("=")[1];
+                    obj["competition_index"] = window.location.pathname.split("/")[2];
                 }
         
                 final.push(obj);
@@ -690,7 +704,7 @@ class user extends Component {
     }
 
     handleAddGate(){
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         const payload = {
             competition_index: competition_index,
             gate_number: this.state.gateNo,
@@ -731,7 +745,7 @@ class user extends Component {
     }
 
     updateGate () {
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         let gate_index = this.state.gateIndex;
         const payload = {
             competition_index: competition_index,
@@ -769,7 +783,7 @@ class user extends Component {
             gateIndex: gateIndex
         })
 
-        let competition_index = window.location.pathname.split("=")[1];
+        let competition_index = window.location.pathname.split("/")[2];
         const payload = {
             competition_index: competition_index
         };
@@ -876,6 +890,13 @@ class user extends Component {
     handelTimerReset() {
         this.setState({ timerStarted: false, timerPause: true, hours: 0, miniutes: 0, seconds: 0});
         clearInterval(this.timer);
+    }
+
+//---ResultDetail---//
+
+    resultDetail = (resultsIndex) => {
+        let competition_index = window.location.pathname.split("/")[2];
+        window.location = `${subDomain}/competition/${competition_index}/user=${resultsIndex}`
     }
 
 
@@ -1291,7 +1312,8 @@ class user extends Component {
                         <HeaderText  header >Last name</HeaderText>
                         <HeaderText  header >Gender</HeaderText>
                         <HeaderText  header small>Round Total</HeaderText>
-                        <HeaderText  header >Times Total (min.)</HeaderText>
+                        <HeaderText  header big>Times Total (min.)</HeaderText>
+                        <HeaderText  header small>Detail</HeaderText>
                     </ContainerTable>
                     <ContainerItems>
                         {
@@ -1305,8 +1327,11 @@ class user extends Component {
                                             <HeaderText item >{results.last_name}</HeaderText>
                                             <HeaderText item >{results.gender}</HeaderText>
                                             <HeaderText item small>{results.round_total}</HeaderText>
-                                            <HeaderText item >{results.times_total}</HeaderText>
+                                            <HeaderText item big>{results.times_total}</HeaderText>
                                         </CompetitionStyled>
+                                        <IconDetail onClick={() => this.resultDetail(results.index)}>
+                                            <img src={icon_detail} alt={icon_detail}></img>
+                                        </IconDetail>
                                     </ContainerAllItems>
                                 )
                             })
