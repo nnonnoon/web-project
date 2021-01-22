@@ -1,6 +1,5 @@
 import pool from '../../database/database'
 import loggingDomain from '../../domain/logging/loggingDomain'
-import router from '../../routers/login/authRouter';
 
 const loggingController = {}
 
@@ -34,6 +33,7 @@ loggingController.fetchResult = async(req, res, next) => {
         for(var key in visitTag) {
             var obj = {};
             const user_detail = await loggingDomain.userDetail(logging, key, competition_index);
+            obj["index"] = user_detail.index;
             obj["name_title"] = user_detail.name_title;
             obj["first_name"] = user_detail.first_name;
             obj["last_name"] = user_detail.last_name;

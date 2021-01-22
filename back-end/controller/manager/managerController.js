@@ -190,6 +190,7 @@ managerController.fetchUser = async(req, res, next) => {
     const { user_index } = req.params;
     const manager = await pool.connect();
 
+
     try{
         await manager.query("BEGIN");
         const user = await managerDomain.fetchUser(manager, user_index);
@@ -213,6 +214,7 @@ managerController.fetchUser = async(req, res, next) => {
 managerController.fetchAllUser = async(req, res, next) => {
     const { competition_index } = req.params;
     const manager = await pool.connect();
+
     try{
         await manager.query("BEGIN");
         const dataAllUser = await managerDomain.fetchAllUser(manager, competition_index);
