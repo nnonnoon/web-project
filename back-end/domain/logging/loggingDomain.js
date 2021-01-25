@@ -35,13 +35,13 @@ loggingDomain.mapTags = async(logging, tag_number) => {
 
 loggingDomain.userDetail = async(logging, tag_name, competition_index) => {
     try{
-        const map_tags = await logging.query(`
+        const user_detail = await logging.query(`
             SELECT index, name_title, competition_index, first_name, last_name, gender, tag_name
             FROM "user"
             WHERE tag_name = '${tag_name}' and competition_index = ${competition_index}
         `);
 
-        return map_tags.rows[0];
+        return user_detail.rows[0];
 
     }catch(err){
         console.log(err)
@@ -49,5 +49,44 @@ loggingDomain.userDetail = async(logging, tag_name, competition_index) => {
     }
 }
 
+loggingDomain.userResultDetail = async(logging, user_index) => {
+    try{
+        const user_result_detail = await logging.query(`
+            SELECT index, name_title, competition_index, first_name, last_name, gender, tag_name
+            FROM "user"
+            WHERE index = ${user_index} 
+        `);
+
+        return user_result_detail.rows[0];
+
+    }catch(err){
+        console.log(err)
+        throw err;
+    }
+}
+
+loggingDomain.get = async(logging, SELECT, FROM, WHERE) => {
+    try{
+        var str = "SELECT ";
+        for(let i = 0; i < SELECT.length ; i++){
+            if(i == SELECT.length-1){
+                str = str + SELECT[i];
+            }else{
+                str = str + SELECT[i] + ",";
+            }
+        }
+
+        str = str + " FROM " + `${FROM[0]}`;
+
+        if(WHERE.length > 0 ){
+            str = str + " WHERE "+ `${WHERE[0]}`;
+        }
+
+        const all_tags = await logging.query(str);
+        return all_tags.rows;
+    }catch(err){
+        throw err;
+    }
+}
 
 export default loggingDomain;
