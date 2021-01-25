@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import MediaQuery from "react-responsive";
-
+import { results_api } from '../../services/api';
+import { message } from 'antd';
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -20,8 +21,8 @@ const ContainerTable = styled.div`
     justify-content: space-between;
     align-items: center;
     margin-top: 2rem;
-    padding-left: 15%;
-    padding-right: 15%;
+    padding-left: 10%;
+    padding-right: 10%;
     height: 6%;
     background: #FFA378;
 `
@@ -58,55 +59,84 @@ const ItemsTable = styled.div`
     align-items: center;
     width:  100%;
     font-size: 16px;
-    font-weight: bold;
     border-bottom: 3px solid #E6E6E6;
     color: black;
     cursor: pointer;
 `
 
 class resultDetail extends Component {
+    constructor(props){
+        super(props);
+        this.fetchResults();
+        this.state = {
+            results : []
+        }   
+    }
+
+    fetchResults() {
+        let competition_index = window.location.pathname.split("/")[2];
+        let user_index = window.location.pathname.split("=")[1];
+
+        results_api.fetchResultDetail(
+            competition_index,
+            user_index,
+            ({data}) => {
+                this.setState({
+                    results: data.results
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
+
     render() {
         return (
             <MediaQuery minDeviceWidth={680}>
                  <ContainerLayout> 
-                    <Header fontSize= "2rem">การทดสอบสมรรถภาพครั้งที่ 1</Header>
-                    <Header fontSize= "1.5rem">นายตะวัน จันทรา</Header>
+                 {
+                        this.state.results.map((results, index) => {
+                            if(index > 0){
+                                return
+                            }
+                            return(
+                                <Header fontSize= "2rem" key={index + 1}>{results.competition_name}</Header>
+                            )
+                        })
+                    }
+
+                    {
+                            this.state.results.map((results, index) => {
+                                if(index > 0){
+                                    return
+                                }
+                                return(
+                                    <Header fontSize= "1.5rem" key={index + 1}>{results.name_title}{results.first_name}  {results.last_name}</Header>
+                                )
+                            })
+
+                    }
                         <ContainerTable>
                             <HeaderTable>Date</HeaderTable>
                             <HeaderTable>Lap</HeaderTable>
-                            <HeaderTable>Times (m.s)</HeaderTable>
+                            <HeaderTable>Times</HeaderTable>
                         </ContainerTable>
                         <ContainerItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
-                            <ContainerAllItems>
-                                <ItemsTable style={{paddingLeft: "6%"}}>25/10/2020</ItemsTable>
-                                <ItemsTable>1</ItemsTable>
-                                <ItemsTable style={{paddingRight: "6%"}}>12.00</ItemsTable>
-                            </ContainerAllItems>
+                        {
+                            this.state.results.map((results, index) => {
+                                return(
+                                    <ContainerAllItems key={index+1}>
+                                            <ItemsTable>{results.date}</ItemsTable>
+                                            <ItemsTable>{results.round}</ItemsTable>
+                                            <ItemsTable>{results.time}</ItemsTable>
+                                    </ContainerAllItems>
+                                )
+                            })
+                        }
                         </ContainerItems>
                 </ContainerLayout>
             </MediaQuery>

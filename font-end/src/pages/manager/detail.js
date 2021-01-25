@@ -894,9 +894,9 @@ class user extends Component {
 
 //---ResultDetail---//
 
-    resultDetail = (resultsIndex) => {
+    resultDetail = (userIndex) => {
         let competition_index = window.location.pathname.split("/")[2];
-        window.location = `${subDomain}/competition/${competition_index}/user=${resultsIndex}`
+        window.location = `${subDomain}/competition/${competition_index}/user=${userIndex}`
     }
 
 
@@ -1312,7 +1312,7 @@ class user extends Component {
                         <HeaderText  header >Last name</HeaderText>
                         <HeaderText  header >Gender</HeaderText>
                         <HeaderText  header small>Round Total</HeaderText>
-                        <HeaderText  header big>Times Total (min.)</HeaderText>
+                        <HeaderText  header big>Times Total</HeaderText>
                         <HeaderText  header small>Detail</HeaderText>
                     </ContainerTable>
                     <ContainerItems>

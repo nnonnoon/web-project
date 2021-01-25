@@ -155,4 +155,9 @@ export const results_api = {
             .get(`/fetchResult/${competition_index}`)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
+    fetchResultDetail: (competition_index, user_index, callback, onRejected) =>
+        loggingApi
+            .get(`/fetchResultDetail/${competition_index}/user=${user_index}`)
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
 };

@@ -54,7 +54,7 @@ function App() {
             />
             <Privateroute
               issignedIn={signedIn}
-              exact path={`${subDomain}/competition/:competition_index/user=:resultsIndex`}
+              exact path={`${subDomain}/competition/:competition_index/user=:userIndex`}
               component={resultDetail}
             />
           </Switch>
