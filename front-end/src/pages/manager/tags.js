@@ -31,6 +31,23 @@ const ButtonScan = styled(Button)`
     }
 `
 
+// const ButtonScan = styled(Button)`
+//     border-radius: 2rem;
+//     cursor: pointer;
+//     background: #7FD2F8;
+//     color: #fff;
+//     font-family: "Roboto";
+//     font-weight: bold;
+//     font-size: 22px;
+//     height: 6%;
+//     width: 15%;
+//     &:hover{
+//         background: #00B0FF;
+//         border-color: #fff;
+//         color: #fff;
+//     }
+// `
+
 const Header = styled.div`
     font-size: 2rem;
     margin-bottom: 2%;
