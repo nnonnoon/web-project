@@ -1,2 +1,2 @@
 # Running project
---- A systematic for records of number of laps and lap time in physical fitness test for running ---
+--- The number of laps and lap time recording system for fitness running test ---
