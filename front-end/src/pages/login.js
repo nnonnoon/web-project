@@ -26,6 +26,19 @@ const Box = styled.div`
   border-radius: 2.8125rem;
 `;
 
+// const Box = styled.div`
+//   height: 40.125rem;
+//   width: 30rem;
+//   background: rgba(0, 176, 255, 0.52);
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+//   display: flex;
+//   flex-direction: row;
+//   position: absolute;
+//   border-radius: 2.8125rem;
+// `;
+
 
 const Flexbox = styled.div`
   width: 100%;
