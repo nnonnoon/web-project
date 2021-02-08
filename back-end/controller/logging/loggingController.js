@@ -44,26 +44,30 @@ loggingController.fetchResult = async(req, res, next) => {
             var dt1 = new Date(value[0]);
             var dt2 = new Date(value[round]);
 
-            // var t2 = dt2.getTime();
-            // var t1 = dt1.getTime();
+            var difference = dt2.getTime() - dt1.getTime();
 
-            // var time_total = parseFloat((t2-t1)/(60*1000)).toFixed(3);
+            var hoursDifference = Math.floor(difference/1000/60/60);
+            difference -= hoursDifference*1000*60*60
 
+            var minutesDifference = Math.floor(difference/1000/60);
+            difference -= minutesDifference*1000*60
 
-            var time_base_minute = dt1.getMinutes();
-            var time_base_second = dt1.getSeconds();
-            var time_base_millisecond = dt1.getMilliseconds();
+            var secondsDifference = Math.floor(difference/1000);
 
-            var time_now_minute = dt2.getMinutes();
-            var time_now_second = dt2.getSeconds();
-            var time_now_millisecond = dt2.getMilliseconds();
+            var millisecondsDifference = Math.floor(difference);
 
-            var time_total_minute = (time_now_minute - time_base_minute).toString();
-            var time_total_second = (time_now_second - time_base_second).toString();
-            var time_total_millisecond = (time_now_millisecond - time_base_millisecond).toString();
+            // console.log('difference = ' +  
+            // hoursDifference + ' hour/s ' + 
+            // minutesDifference + ' minute/s ' + 
+            // secondsDifference + ' second/s '+ 
+            // millisecondsDifference + ' millisecond/ms ');
 
             obj["round_total"] = round;
-            obj["times_total"] = time_total_minute + " m" + " : " + time_total_second + "." + time_total_millisecond + " ms"
+            if(hoursDifference == 0){
+                obj["times_total"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+            }else{
+                obj["times_total"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+            }
 
             Result.push(obj);
         }
@@ -128,9 +132,7 @@ loggingController.fetchResultDetail = async(req, res, next) => {
         var round = 1;
 
         var dt1 = new Date(logging_tb[0].timestamp);
-        var time_base_minute = dt1.getMinutes();
-        var time_base_second = dt1.getSeconds();
-        var time_base_millisecond = dt1.getMilliseconds();
+        var time_base = dt1.getTime();
 
         for(let i = 1 ; i < logging_tb.length ; i++){
             var dt2 = new Date(logging_tb[i].timestamp);
@@ -138,16 +140,31 @@ loggingController.fetchResultDetail = async(req, res, next) => {
             var month = dt2.getMonth();
             var year = dt2.getFullYear();
 
-            var time_now_minute = dt2.getMinutes();
-            var time_now_second = dt2.getSeconds();
-            var time_now_millisecond = dt2.getMilliseconds();
+            var time_now = dt2.getTime();
+
+            // var time_now_minute = dt2.getMinutes();
+            // var time_now_second = dt2.getSeconds();
+            // var time_now_millisecond = dt2.getMilliseconds();
+
+            var difference = time_now - time_base;
+
+            var hoursDifference = Math.floor(difference/1000/60/60);
+            difference -= hoursDifference*1000*60*60
+
+            var minutesDifference = Math.floor(difference/1000/60);
+            difference -= minutesDifference*1000*60
+
+            var secondsDifference = Math.floor(difference/1000);
+
+            var millisecondsDifference = Math.floor(difference);
+
 
             month =  parseInt(month) + 1;
             month = month.toString();
 
-            var time_per_lap_minute = (time_now_minute - time_base_minute).toString();
-            var time_per_lap_second = (time_now_second - time_base_second).toString();
-            var time_per_lap_millisecond = (time_now_millisecond - time_base_millisecond).toString();
+            // var time_per_lap_minute = (time_now_minute - time_base_minute).toString();
+            // var time_per_lap_second = (time_now_second - time_base_second).toString();
+            // var time_per_lap_millisecond = (time_now_millisecond - time_base_millisecond).toString();
 
             var obj = {};
             
@@ -158,16 +175,18 @@ loggingController.fetchResultDetail = async(req, res, next) => {
             obj["last_name"] = user_detail.last_name;
             obj["date"] = date + "/" + month + "/" + year;
             obj["round"] = round;
-            obj["time"] = time_per_lap_minute + " m" + " : " + time_per_lap_second + "." + time_per_lap_millisecond + " ms"
+            // obj["time"] = time_per_lap_minute + " m" + " : " + time_per_lap_second + "." + time_per_lap_millisecond + " ms"
+            if(hoursDifference == 0){
+                obj["time"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+            }else{
+                obj["time"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+            }
 
-            time_base_minute = time_now_minute;
-            time_base_second = time_now_second;
-            time_base_millisecond = time_now_millisecond;
+            time_base = time_now;
             round = round + 1;
-
             Result.push(obj);
         }
-
+        
         res.status(200).json({
             results: Result
         });
