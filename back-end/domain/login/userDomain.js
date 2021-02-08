@@ -3,7 +3,7 @@ const userDomain = {}
 userDomain.findUser = async(auth, login_index) => {
     try{
         const response = await auth.query(`
-            SELECT index, username, password,role 
+            SELECT index, username, password, role 
             FROM login
             WHERE index = ${login_index}
         `);
@@ -28,7 +28,7 @@ userDomain.fetchAllUser = async(auth) => {
 userDomain.selectUser = async(auth, username) => {
     try{
         const response = await auth.query(`
-            SELECT index, username, password,role, name_tiltle, first_name, last_name, gender 
+            SELECT index, username, password,role, name_title, first_name, last_name, gender 
             FROM login
             WHERE username = '${username}'
         `);
@@ -42,7 +42,7 @@ userDomain.insertUser = async(auth, payload) => {
     try{
         const response = await auth.query(`
             INSERT INTO "login" (username, password, role, name_title, first_name, last_name, gender)
-            VALUES ('${payload.username}', '${payload.password}', '${payload.role}', '${name_title}', '${first_name}', '${last_name}', '${gender}') 
+            VALUES ('${payload.username}', '${payload.password}', '${payload.role}', '${payload.name_title}', '${payload.first_name}', '${payload.last_name}', '${payload.gender}') 
             RETURNING *
         `);
         return response.rows[0].index;

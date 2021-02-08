@@ -64,7 +64,7 @@ userController.addUser = async(req, res, next) => {
                 payload["username"] = username;
                 payload["password"] = hashSync(genPassword, salt);
                 payload["role"] = req.body.role.toLowerCase();
-                payload["name_tiltle"] = name_title;
+                payload["name_title"] = name_title;
                 payload["first_name"] = first_name;
                 payload["last_name"] = last_name;
                 payload["gender"] = gender;
