@@ -1,14 +1,17 @@
 import axios from 'axios';
 
+var HOST = "localhost";
+var PORT = 3001;
+
 const commonApi = axios.create({
-    baseURL: 'http://localhost:3001/api',
+    baseURL: `http://${HOST}:${PORT}/api`,
     headers: {
         "Content-Type": "application/json",
     },
 });
 
 const managerApi = axios.create({
-    baseURL: 'http://localhost:3001/api/manager',
+    baseURL: `http://${HOST}:${PORT}/api/manager`,
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access-token")}`,
@@ -17,7 +20,7 @@ const managerApi = axios.create({
 
 
 const tagsApi = axios.create({
-    baseURL: 'http://localhost:3001/api/tags',
+    baseURL: `http://${HOST}:${PORT}/api/tags`,
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access-token")}`,
@@ -26,7 +29,7 @@ const tagsApi = axios.create({
 
 
 const loggingApi = axios.create({
-    baseURL: 'http://localhost:3001/api/logging',
+    baseURL: `http://${HOST}:${PORT}/api/logging`,
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access-token")}`,
