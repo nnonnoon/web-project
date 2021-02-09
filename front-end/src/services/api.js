@@ -2,6 +2,7 @@ import axios from 'axios';
 
 var HOST = "localhost";
 var PORT = 3001;
+var PORT_Command = 5000;
 
 const commonApi = axios.create({
     baseURL: `http://${HOST}:${PORT}/api`,
@@ -33,6 +34,13 @@ const loggingApi = axios.create({
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+    },
+});
+
+const commandApi = axios.create({
+    baseURL: `http://${HOST}:${PORT_Command}`,
+    headers: {
+        "Content-Type": "application/json",
     },
 });
 
@@ -161,6 +169,14 @@ export const results_api = {
     fetchResultDetail: (competition_index, user_index, callback, onRejected) =>
         loggingApi
             .get(`/fetchResultDetail/${competition_index}/user=${user_index}`)
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
+};
+
+export const command_api = {
+    command_start: (payload, callback, onRejected) => 
+        commandApi
+            .post('/command', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
 };

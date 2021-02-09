@@ -1,7 +1,7 @@
 import React, { Component  } from 'react';
 import MediaQuery from "react-responsive";
 import { Button, Modal, Form, Input, message,  Dropdown, Menu } from 'antd';
-import { manager, results_api } from '../../services/api'
+import { manager, results_api, command_api } from '../../services/api'
 import styled from 'styled-components'
 import edit from '../../assets/icon/edit.svg'
 import trashIcon from '../../assets/icon/bin.svg'
@@ -863,6 +863,25 @@ class user extends Component {
     handelTimerStart(e){
         e.preventDefault();
 
+        let competition_index = window.location.pathname.split("/")[2];
+
+        const payload = {
+            competition: competition_index,
+            command: "start"
+        };
+
+        command_api.command_start(
+            payload,
+            ({ data }) => {
+                message.success("++++++ Running Start ++++++");
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+
         if(this.state.timerPause){
             this.timer = setInterval(() => {
                 this.setState({timerStarted: true, timerPause: false})
@@ -1272,10 +1291,10 @@ class user extends Component {
                     <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
                         <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
                         <div style={{height: "30%", width: "5%"}}/>
-                        <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
+                        {/* <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
                         <div style={{height: "30%", width: "5%"}}/>
                         <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
-                        <div style={{height: "30%", width: "5%"}}/>
+                        <div style={{height: "30%", width: "5%"}}/> */}
                         <ButtonOfCompetition >End</ButtonOfCompetition>
                     </div>
                     
