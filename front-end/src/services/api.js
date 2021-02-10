@@ -179,4 +179,9 @@ export const command_api = {
             .post('/command', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
+    command_end: (payload, callback, onRejected) => 
+        commandApi
+            .post('/command', payload)
+            .then(({data}) => callback({data}))
+            .catch(({response}) => onRejected(response)),
 };

@@ -898,6 +898,30 @@ class user extends Component {
             }, 1000)
         }
     }  
+
+    handelTimerEnd(e){
+        e.preventDefault();
+
+        let competition_index = window.location.pathname.split("/")[2];
+
+        const payload = {
+            competition: competition_index,
+            command: "end"
+        };
+
+        command_api.command_end(
+            payload,
+            ({ data }) => {
+                message.success("++++++ Running End ++++++");
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+    }  
+
     
     handelTimerPause(e) {
         e.preventDefault();
@@ -1295,7 +1319,7 @@ class user extends Component {
                         <div style={{height: "30%", width: "5%"}}/>
                         <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
                         <div style={{height: "30%", width: "5%"}}/> */}
-                        <ButtonOfCompetition >End</ButtonOfCompetition>
+                        <ButtonOfCompetition  onClick={this.handelTimerEnd.bind(this)}>End</ButtonOfCompetition>
                     </div>
                     
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
