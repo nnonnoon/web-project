@@ -404,8 +404,8 @@ class competition extends Component {
                                 return(
                                    <ContainerAllItems>
                                         <CompetitionStyled key={index+1} onClick={() => this.handleLinkPage(competition.index)}>
-                                            <HeaderText item small>{index+1}</HeaderText>
-                                            <HeaderText item big>{competition.competition_name}</HeaderText>
+                                            <HeaderText item small >{index+1}</HeaderText>
+                                            <HeaderText item big >{competition.competition_name}</HeaderText>
                                             <HeaderText item big>{competition.location}</HeaderText>
                                             <HeaderText item small>{competition.date}</HeaderText>
                                             <HeaderText item>{competition.time_start} : {competition.time_end}</HeaderText>

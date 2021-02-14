@@ -13,7 +13,9 @@ import antenna from '../../assets/icon/antenna.svg';
 import start from '../../assets/icon/start.svg';
 import results from '../../assets/icon/results.svg';
 import icon_detail from '../../assets/icon/icon_detail.svg';
+import gifrunning from '../../assets/icon/gifrunning.gif'
 import { subDomain } from '../../services/redirect'
+import Swal from 'sweetalert2'
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -245,18 +247,18 @@ const GateStyle = styled.div`
     }
 `
 
-const ButtonOfCompetition = styled.div`
+const ButtonOfCompetition = styled(Button)`
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 80%; 
-    width: 20%; 
+    height: 35%; 
+    width: 60%; 
     font-size: 2rem;
-    background-color: ${ props => props.started ? "#58D1B4": props.pause ? "#FFBD54" : props.reset? "#7FD2F8": "#FF6666"}; 
+    background-color: ${ props => props.started ? "#58D1B4": "#FF6666"}; 
     color: white; 
     border-radius: 2rem;
     cursor: pointer;
-
+    
     :hover{
         background: #E5E5E5;
         border-color: white 1rem;
@@ -264,10 +266,23 @@ const ButtonOfCompetition = styled.div`
     }
 `
 
+const ContainerCompetition = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transform: translate(90%, 5%);
+    width: 35%;
+    border-radius: 1rem;
+    height: 90%;
+    background: #EDC9AF;
+`
+
 
 
 class user extends Component {
     formRef = React.createRef();
+    
 
     constructor(props){
         super(props);
@@ -275,6 +290,8 @@ class user extends Component {
         this.fetchCompetition();
         this.fetchAllGate();
         this.fetchResults();
+        let competition_index = window.location.pathname.split("/")[2]
+
         this.state = {
             competition_name: "",
             competition_index: "",
@@ -311,8 +328,10 @@ class user extends Component {
             timerPause: true,
             hours: 0,
             miniutes: 0,
-            seconds: 0
-            
+            seconds: 0,
+
+            button_start : (localStorage.getItem(`button_start_${competition_index}`) === 'true'),
+            button_end : (localStorage.getItem(`button_end_${competition_index}`) === 'true')
         }
         this.handleDel = this.handleDel.bind(this);
     }
@@ -861,9 +880,32 @@ class user extends Component {
 //---Timer---//
 
     handelTimerStart(e){
+
+        console.log(this.state.button_start)
+        Swal.fire({
+            position: '28px',
+            icon: 'success',
+            title: 'The competition started',
+            showConfirmButton: false,
+            timer: 1500,
+            backdrop: `
+                rgba(195, 253, 184,0.4)
+                url(${gifrunning})
+                left
+                no-repeat
+            `
+          })
+    
+
         e.preventDefault();
 
         let competition_index = window.location.pathname.split("/")[2];
+
+        localStorage.setItem(`button_start_${competition_index}`, true)
+
+        this.setState({
+            button_start: true
+        })
 
         const payload = {
             competition: competition_index,
@@ -873,7 +915,7 @@ class user extends Component {
         command_api.command_start(
             payload,
             ({ data }) => {
-                message.success("++++++ Running Start ++++++");
+                // message.success("++++++ Running Start ++++++");
             },
             (response) => {
                 if (response && response.status === 400) {
@@ -900,9 +942,27 @@ class user extends Component {
     }  
 
     handelTimerEnd(e){
+        Swal.fire({
+            position: 'middle',
+            icon: 'error',
+            title: 'The end of competition',
+            showConfirmButton: false,
+            timer: 1500,
+            backdrop: `
+                rgba(247, 93, 89,0.4)
+            `
+          })
+
+
         e.preventDefault();
 
         let competition_index = window.location.pathname.split("/")[2];
+
+        localStorage.setItem(`button_end_${competition_index}`, true)
+
+        this.setState({
+            button_end: true
+        })
 
         const payload = {
             competition: competition_index,
@@ -912,7 +972,7 @@ class user extends Component {
         command_api.command_end(
             payload,
             ({ data }) => {
-                message.success("++++++ Running End ++++++");
+                // message.success("++++++ Running End ++++++");
             },
             (response) => {
                 if (response && response.status === 400) {
@@ -1305,24 +1365,28 @@ class user extends Component {
             <div style={{ width: "80%", height: "35rem", marginLeft: "25%"}}>
                 <MediaQuery minDeviceWidth={680}>
                     <ContainerOption >
-                            <div style={{fontSize: "3rem"}}>Start</div>
-                            <div style={{width: "2%"}}/>
-                            <div style={{fontSize: "3rem"}}>The</div>
-                            <div style={{width: "2%"}}/>
-                            <div style={{fontSize: "3rem"}}>Competition</div>
+                        <div style={{fontSize: "3rem"}}>Competition</div>
                     </ContainerOption>
 
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
+                    {/* <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
                         <ButtonOfCompetition  started onClick={this.handelTimerStart.bind(this)}>Start</ButtonOfCompetition>
                         <div style={{height: "30%", width: "5%"}}/>
-                        {/* <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
+                        <ButtonOfCompetition  pause onClick={this.handelTimerPause.bind(this)}>Pause</ButtonOfCompetition>
                         <div style={{height: "30%", width: "5%"}}/>
                         <ButtonOfCompetition  reset onClick={this.handelTimerReset.bind(this)}>Reset</ButtonOfCompetition>
-                        <div style={{height: "30%", width: "5%"}}/> */}
+                        <div style={{height: "30%", width: "5%"}}/>
                         <ButtonOfCompetition  onClick={this.handelTimerEnd.bind(this)}>End</ButtonOfCompetition>
-                    </div>
+                    </div> */}
+
+                    <ContainerCompetition>
+                        <ButtonOfCompetition started onClick={this.handelTimerStart.bind(this)} disabled={this.state.button_start}>Start</ButtonOfCompetition>
+                        <div style={{height: "10%", width: "5%"}}/>
+                        <ButtonOfCompetition  onClick={this.handelTimerEnd.bind(this)} disabled={this.state.button_end}>End</ButtonOfCompetition>
+                    </ContainerCompetition>
                     
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
+
+                    
+                    {/* <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "10%", fontSize: "3rem", marginBottom: "2rem"}}>Time</div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "40%"}}>
                         <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#58D1B4", color: "black"}}>
                                 {this.state.hours + " H" }
@@ -1335,7 +1399,7 @@ class user extends Component {
                         <div style={{height: "100%", width: "22%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", backgroundColor: "#E6E6E6", borderRadius: "50%", border: "solid 6px", borderColor: "#FF7D7D",  color: "black"}}>
                                 { this.state.seconds + " S"}                                    
                         </div>
-                    </div>
+                    </div> */}
                 </MediaQuery>
             </div>
         );
@@ -1483,11 +1547,15 @@ class user extends Component {
                         <img src={results} alt={results} style={{marginRight: "5%"}}/> Results 
                     </MenuOption>
 
+                    <p>{this.state.button_start}</p>
+                    <p>{this.state.button_end}</p>
+
                 </ContainerMenu>
                     {
-                        this.state.menu_users ? this.isUserMode() : this.state.menu_gates ? this.isGateMode() : this.state.menu_start ? this.isStartMode() : this.isResultMode() 
+                        this.state.menu_users ? this.isStartMode()  : this.state.menu_gates ? this.isGateMode() : this.state.menu_start ?  this.isUserMode(): this.isResultMode() 
                     }
             </ContainerLayout>
+
         );
     }
 }
