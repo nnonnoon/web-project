@@ -41,7 +41,7 @@ const HeaderTable = styled.div`
 const ContainerItems = styled.div`
     display: flex;
     flex-direction: column;
-    height: 30rem;
+    height: 25rem;
     overflow: scroll;
 `
 
@@ -64,12 +64,51 @@ const ItemsTable = styled.div`
     cursor: pointer;
 `
 
+const ContainerOption = styled.div`
+    display: flex;
+`
+
+const ContainerTotal = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: #FFD085;
+    width: ${(props) => props.width};
+    border-radius: 5px;
+    padding: 10px 10px 10px 10px ;
+`
+
+const ItemTotal = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 16px;
+    font-weight: bold;
+`
+
+const DownloadPDF = styled.button`
+    background: #D5DBDB ; 
+    width: 50%; 
+    height: 100%; 
+    margin-left: 2%;
+    font-weight: bold;
+    border-radius: 5px;
+    border-color: black;
+
+    :hover{
+        background: white;
+    }
+`
+
 class resultDetail extends Component {
     constructor(props){
         super(props);
         this.fetchResults();
+        this.fetchTotalResults();
         this.state = {
-            results : []
+            results : [],
+            totalResult: [],
+            user_index : Number(window.location.pathname.split("=")[1])
         }   
     }
 
@@ -93,6 +132,24 @@ class resultDetail extends Component {
         );
     }
 
+    fetchTotalResults() {
+        let competition_index = window.location.pathname.split("/")[2];
+        results_api.fetchResult(
+            competition_index,
+            ({ data }) => {
+                console.log(data.results)
+                this.setState({
+                    totalResult : data.results
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        );
+    }
+
 
     render() {
         return (
@@ -101,7 +158,7 @@ class resultDetail extends Component {
                  {
                         this.state.results.map((results, index) => {
                             if(index > 0){
-                                return
+                                return (<></>)
                             }
                             return(
                                 <Header fontSize= "2rem" key={index + 1}>{results.competition_name}</Header>
@@ -112,7 +169,7 @@ class resultDetail extends Component {
                     {
                             this.state.results.map((results, index) => {
                                 if(index > 0){
-                                    return
+                                    return (<></>)
                                 }
                                 return(
                                     <Header fontSize= "1.5rem" key={index + 1}>{results.name_title}{results.first_name}  {results.last_name}</Header>
@@ -120,6 +177,36 @@ class resultDetail extends Component {
                             })
 
                     }
+                    <ContainerOption>
+                        <ContainerTotal width = "60%">
+                            {
+                                this.state.totalResult.map((totalResult, index) => {
+                                    if(totalResult.index === this.state.user_index){
+                                        return (
+                                            <ItemTotal key={index + 1}>Times Total ==> <div style={{color:"#1E8449 " }}> {totalResult.times_total} </div></ItemTotal>
+                                        )
+                                    }
+                                    return(<></>)
+                                })
+
+                            }
+
+                            {
+                                this.state.totalResult.map((totalResult, index) => {
+                                    if(totalResult.index === this.state.user_index){
+                                        return (
+                                            <ItemTotal key={index + 1}>Round Total ==> <span style={{color:"#1E8449 "}}> {totalResult.round_total} </span></ItemTotal>
+                                        )
+                                    }
+                                    return(<></>)
+                                })
+
+                            }
+                        </ContainerTotal>
+                        <DownloadPDF >EXPORT</DownloadPDF>
+                    </ContainerOption>
+
+
                         <ContainerTable>
                             <HeaderTable>Date</HeaderTable>
                             <HeaderTable>Lap</HeaderTable>
