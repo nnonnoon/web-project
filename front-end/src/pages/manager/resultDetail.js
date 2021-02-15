@@ -4,6 +4,25 @@ import MediaQuery from "react-responsive";
 import { results_api } from '../../services/api';
 import { message } from 'antd';
 
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+pdfMake.fonts = {
+    Sarabun: {
+        normal: 'Sarabun-Bold.ttf',
+        bold: 'Sarabun-BoldItalic.ttf',
+        italics: 'Sarabun-Italic.ttf',
+        bolditalics: 'Sarabun-Regular.ttf'
+    },
+    Roboto: {
+      normal: 'Roboto-Regular.ttf',
+      bold: 'Roboto-Medium.ttf',
+      italics: 'Roboto-Italic.ttf',
+      bolditalics: 'Roboto-MediumItalic.ttf'
+    }
+}
+
 const ContainerLayout = styled.div`
     display: flex;
     flex-direction: column;
@@ -94,10 +113,12 @@ const DownloadPDF = styled.button`
     font-weight: bold;
     border-radius: 5px;
     border-color: black;
+    cursor: pointer;
 
     :hover{
         background: white;
     }
+
 `
 
 class resultDetail extends Component {
@@ -108,21 +129,35 @@ class resultDetail extends Component {
         this.state = {
             results : [],
             totalResult: [],
-            user_index : Number(window.location.pathname.split("=")[1])
+            user_index : Number(window.location.pathname.split("=")[1]),
+            
+            competition_name : "",
+            name_title : "",
+            first_name : "",
+            last_name : "",
+            times_total : "qqq",
+            round_total : ""
         }   
     }
 
     fetchResults() {
         let competition_index = window.location.pathname.split("/")[2];
-        let user_index = window.location.pathname.split("=")[1];
+        let user_index = Number(window.location.pathname.split("=")[1]);
 
         results_api.fetchResultDetail(
             competition_index,
             user_index,
             ({data}) => {
-                this.setState({
-                    results: data.results
-                });
+                for(let i = 0 ; i < data.results.length ; i ++){
+                    console.log(data.results[i].competition_name )
+                    this.setState({
+                        results: data.results,
+                        competition_name: data.results[i].competition_name,
+                        name_title : data.results[i].name_title,
+                        first_name : data.results[i].first_name,
+                        last_name : data.results[i].last_name,
+                    });
+                }
             },
             (response) => {
                 if (response && response.status === 400) {
@@ -134,13 +169,20 @@ class resultDetail extends Component {
 
     fetchTotalResults() {
         let competition_index = window.location.pathname.split("/")[2];
+        let user_index = Number(window.location.pathname.split("=")[1]);
+
         results_api.fetchResult(
             competition_index,
             ({ data }) => {
-                console.log(data.results)
-                this.setState({
-                    totalResult : data.results
-                });
+                for(let i = 0 ; i < data.results.length ; i ++){
+                    if(user_index === data.results[i].index){
+                        this.setState({
+                            totalResult : data.results,
+                            times_total : data.results[i].times_total,
+                            round_total : data.results[i].round_total
+                        });
+                    }
+                }
             },
             (response) => {
                 if (response && response.status === 400) {
@@ -150,6 +192,45 @@ class resultDetail extends Component {
         );
     }
 
+
+    printPDF () {
+
+        var docDefinition = {
+            content: [
+                // { text: `${this.state.competition_name} 
+                //          ${this.state.name_title} ${this.state.first_name} ${this.state.last_name}
+                //          ${this.state.times_total}
+                //          ${this.state.round_total}` , fontSize: 15 },
+                { text : `${this.state.competition_name}`, style: 'header', fontSize: 16},
+                { text : `ชื่อ-สกุล : ${this.state.name_title}${this.state.first_name} ${this.state.last_name}`, style: 'subheader', fontSize: 10},
+                {
+                    table: {
+                      body: [
+                       ['วัน/เดือน/ปี', 'รอบ', 'เวลาที่ใช้'],
+                            [
+                            this.state.results.map((results, index) =>{
+                                    return results.date
+                                }),
+                            this.state.results.map((results, index) =>{
+                                    return results.round
+                                }) ,
+                            this.state.results.map((results, index) =>{
+                                    return results.time
+                                }) 
+                            ]     
+                      ]
+                    }
+                }
+            ],
+
+
+            defaultStyle:{
+                font: 'Sarabun'
+            }
+        };
+        pdfMake.createPdf(docDefinition).open()
+    }
+    
 
     render() {
         return (
@@ -161,7 +242,7 @@ class resultDetail extends Component {
                                 return (<></>)
                             }
                             return(
-                                <Header fontSize= "2rem" key={index + 1}>{results.competition_name}</Header>
+                                <Header fontSize= "2rem" key={index + 1} >{results.competition_name}</Header>
                             )
                         })
                     }
@@ -179,31 +260,10 @@ class resultDetail extends Component {
                     }
                     <ContainerOption>
                         <ContainerTotal width = "60%">
-                            {
-                                this.state.totalResult.map((totalResult, index) => {
-                                    if(totalResult.index === this.state.user_index){
-                                        return (
-                                            <ItemTotal key={index + 1}>Times Total ==> <div style={{color:"#1E8449 " }}> {totalResult.times_total} </div></ItemTotal>
-                                        )
-                                    }
-                                    return(<></>)
-                                })
-
-                            }
-
-                            {
-                                this.state.totalResult.map((totalResult, index) => {
-                                    if(totalResult.index === this.state.user_index){
-                                        return (
-                                            <ItemTotal key={index + 1}>Round Total ==> <span style={{color:"#1E8449 "}}> {totalResult.round_total} </span></ItemTotal>
-                                        )
-                                    }
-                                    return(<></>)
-                                })
-
-                            }
+                            <ItemTotal >Times Total ==> <div style={{color:"#1E8449 " }}> {this.state.times_total} </div></ItemTotal>
+                            <ItemTotal >Round Total ==> <span style={{color:"#1E8449 "}}> {this.state.round_total} </span></ItemTotal>       
                         </ContainerTotal>
-                        <DownloadPDF >EXPORT</DownloadPDF>
+                        <DownloadPDF onClick = { () => this.printPDF()}>EXPORT</DownloadPDF>
                     </ContainerOption>
 
 
