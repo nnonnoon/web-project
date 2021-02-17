@@ -176,7 +176,7 @@ export const results_api = {
 export const command_api = {
     command_start: (payload, callback, onRejected) => 
         commandApi
-            .post('/logging', payload)
+            .post('/start', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
     command_end: (payload, callback, onRejected) => 
