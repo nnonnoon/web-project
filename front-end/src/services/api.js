@@ -176,12 +176,12 @@ export const results_api = {
 export const command_api = {
     command_start: (payload, callback, onRejected) => 
         commandApi
-            .post('/command', payload)
+            .post('/logging', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
     command_end: (payload, callback, onRejected) => 
         commandApi
-            .post('/command', payload)
+            .post('/logging', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
 };
