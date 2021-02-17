@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-var HOST = "localhost";
+var HOST = "localhost" || "192.168.2.4";
 var PORT = 3001;
 var PORT_Command = 5000;
 
