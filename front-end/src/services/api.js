@@ -181,7 +181,7 @@ export const command_api = {
             .catch(({response}) => onRejected(response)),
     command_end: (payload, callback, onRejected) => 
         commandApi
-            .post('/logging', payload)
+            .post('/start', payload)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
 };
