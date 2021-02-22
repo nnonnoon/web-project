@@ -64,9 +64,9 @@ loggingController.fetchResult = async(req, res, next) => {
 
             obj["round_total"] = round;
             if(hoursDifference == 0){
-                obj["times_total"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+                obj["times_total"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
             }else{
-                obj["times_total"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+                obj["times_total"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
             }
 
             Result.push(obj);
@@ -177,9 +177,9 @@ loggingController.fetchResultDetail = async(req, res, next) => {
             obj["round"] = round;
             // obj["time"] = time_per_lap_minute + " m" + " : " + time_per_lap_second + "." + time_per_lap_millisecond + " ms"
             if(hoursDifference == 0){
-                obj["time"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+                obj["time"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
             }else{
-                obj["time"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " ms"
+                obj["time"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
             }
 
             time_base = time_now;
@@ -196,6 +196,128 @@ loggingController.fetchResultDetail = async(req, res, next) => {
         console.log(err);
         res.status(500).json({
             message: "Fetch result detail error"
+        });
+    }finally{
+        await logging.release();
+    }
+}
+
+loggingController.exportResult = async(req, res, next) => {
+    const { competition_index } =  req.params;
+    const logging = await pool.connect();
+
+    try{
+        await logging.query("BEGIN");
+        const data_logging = await loggingDomain.fetchResult(logging, competition_index);
+
+        var Result = [];
+        var visitTag = {};
+
+        for(let i = 0; i < data_logging.length ; i ++){
+            var tag_number = data_logging[i].tag_number;
+            var time_stamp = data_logging[i].timestamp;
+            const map_tag = await loggingDomain.mapTags(logging, tag_number);
+
+            var tag_name = map_tag.tag_name;
+
+            if (!(tag_name in visitTag)){
+                visitTag[tag_name] = [];
+            }
+            visitTag[tag_name].push(time_stamp);
+        }  
+
+        for(var key in visitTag) {
+            var obj = {};
+            const user_detail = await loggingDomain.userDetail(logging, key, competition_index);
+            obj["index"] = user_detail.index;
+            obj["name_title"] = user_detail.name_title;
+            obj["first_name"] = user_detail.first_name;
+            obj["last_name"] = user_detail.last_name;
+            obj["gender"] = user_detail.gender;
+
+            var value = visitTag[key];
+            var round = value.length - 1 
+
+            var dt1 = new Date(value[0]);
+            var dt2 = new Date(value[round]);
+
+            var difference = dt2.getTime() - dt1.getTime();
+
+            var hoursDifference = Math.floor(difference/1000/60/60);
+            difference -= hoursDifference*1000*60*60
+
+            var minutesDifference = Math.floor(difference/1000/60);
+            difference -= minutesDifference*1000*60
+
+            var secondsDifference = Math.floor(difference/1000);
+
+            var millisecondsDifference = Math.floor(difference);
+
+            obj["round_total"] = round;
+            if(hoursDifference == 0){
+                obj["times_total"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
+            }else{
+                obj["times_total"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
+            }
+
+            var tmp = []
+            var count = 1
+            var dt_round_1 = new Date(value[0]);
+            var time_base = dt_round_1.getTime();
+
+            for(let i = 1 ; i < value.length ; i++){
+                var dt_round_2 = new Date(value[i]);
+                var date = dt_round_2.getDate();
+                var month = dt_round_2.getMonth();
+                var year = dt_round_2.getFullYear();
+
+                var time_now = dt_round_2.getTime();
+
+                var difference = time_now - time_base;
+
+                var hoursDifference = Math.floor(difference/1000/60/60);
+                difference -= hoursDifference*1000*60*60
+
+                var minutesDifference = Math.floor(difference/1000/60);
+                difference -= minutesDifference*1000*60
+
+                var secondsDifference = Math.floor(difference/1000);
+
+                var millisecondsDifference = Math.floor(difference);
+
+                month =  parseInt(month) + 1;
+                month = month.toString();
+
+                var per_obj = {};
+
+                per_obj["date"] = date + "/" + month + "/" + year;
+                per_obj["round"] = count;
+                if(hoursDifference == 0){
+                    per_obj["time"] = minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
+                }else{
+                    per_obj["time"] =  hoursDifference + "h " + " : " + minutesDifference + " m" + " : " + secondsDifference  + "." + millisecondsDifference + " s"
+                }
+
+                    time_base = time_now;
+                    count = count + 1;
+                    tmp.push(per_obj);
+                }
+
+                obj["per_round"] = tmp;
+                Result.push(obj);
+            }
+
+            
+            await logging.query("COMMIT");
+            res.status(200).json({
+                results: Result
+            });
+    
+    }catch(err){
+        await logging.query("ROLLBACK");
+        console.log(err);
+        res.status(500).json({
+            message: "Export error"
         });
     }finally{
         await logging.release();
