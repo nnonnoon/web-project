@@ -16,6 +16,7 @@ import icon_detail from '../../assets/icon/icon_detail.svg';
 import gifrunning from '../../assets/icon/gifrunning.gif'
 import { subDomain } from '../../services/redirect'
 import Swal from 'sweetalert2'
+import { CSVLink } from "react-csv";
 
 const ContainerLayout = styled.div`
     display: flex;
@@ -24,7 +25,8 @@ const ContainerLayout = styled.div`
 `
 const ContainerOption = styled.div`
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
     padding-top: 3rem;
     margin-bottom: 2rem;
 `
@@ -278,7 +280,20 @@ const ContainerCompetition = styled.div`
     background: #EDC9AF;
 `
 
+const Export = styled.button`
+    background: #D5DBDB ; 
+    width: 20%; 
+    font-size: 1.5rem;
+    font-weight: 400;
+    border-radius: 5px;
+    border-color: black;
+    cursor: pointer;
 
+    :hover{
+        background: white;
+    }
+
+`
 
 class user extends Component {
     formRef = React.createRef();
@@ -290,6 +305,7 @@ class user extends Component {
         this.fetchCompetition();
         this.fetchAllGate();
         this.fetchResults();
+        this.exportCSV();
         let competition_index = window.location.pathname.split("/")[2]
 
         this.state = {
@@ -331,7 +347,9 @@ class user extends Component {
             seconds: 0,
 
             button_start : (localStorage.getItem(`button_start_${competition_index}`) === 'true'),
-            button_end : (localStorage.getItem(`button_end_${competition_index}`) === 'true')
+            button_end : (localStorage.getItem(`button_end_${competition_index}`) === 'true'),
+
+            csv_result : []
         }
         this.handleDel = this.handleDel.bind(this);
     }
@@ -1002,6 +1020,58 @@ class user extends Component {
         window.location = `${subDomain}/competition/${competition_index}/user=${userIndex}`
     }
 
+//---CSV---//
+
+    exportCSV (){
+        let competition_index = window.location.pathname.split("/")[2];
+
+        results_api.exportCSV(
+            competition_index,
+            ({data}) => {
+                let file = [];
+                let header = ['name_title', 'first_name', 'last_name', 'round_total', 'times_total', 'per_round'];
+
+                file.push(header);
+
+                for(let i = 0 ; i < data.results.length ; i++ ){
+                    let tmp = [];
+                    
+                    let name_title =  data.results[i].name_title;
+                    let first_name =  data.results[i].first_name;
+                    let last_name =  data.results[i].last_name;
+                    let round_total =  data.results[i].round_total;
+                    let times_total=  data.results[i].times_total;
+                    let per_round =  data.results[i].per_round;
+                    
+                    let tmp_per_round = []
+                    for(let j = 0 ; j < per_round.length ; j++){
+                        tmp_per_round.push(per_round[j].time)
+                    }
+
+                    tmp.push(name_title)
+                    tmp.push(first_name)
+                    tmp.push(last_name)
+                    tmp.push(round_total)
+                    tmp.push(times_total)
+                    tmp.push(tmp_per_round)
+                    file.push(tmp)
+                }
+
+                console.log(file)
+
+                this.setState({
+                    csv_result : file
+                }) 
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+    }
+
+
 
 //---Mode---//
 
@@ -1410,7 +1480,12 @@ class user extends Component {
             <div style={{ width: "80%", marginLeft: "25%"}}>
                 <MediaQuery minDeviceWidth={680}>
                     <ContainerOption >
-                            <div style={{fontSize: "3rem"}}>Results</div>
+                        <div style={{fontSize: "3rem", marginLeft: "40%"}}>Results</div>
+                        <Export>
+                        <CSVLink filename='Result.csv' data={this.state.csv_result} style={{color: "black"}}>Export</CSVLink>
+                        </Export>
+                       
+
                     </ContainerOption>
                     <ContainerTable result>
                         <HeaderText  header >No.</HeaderText>

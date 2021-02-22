@@ -16,6 +16,7 @@
     "papaparse": "^5.3.0",
     "pdfmake": "^0.1.70",
     "react": "^16.13.1",
+    "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-file-reader": "^1.1.4",
     "react-responsive": "^8.1.0",

@@ -171,6 +171,11 @@ export const results_api = {
             .get(`/fetchResultDetail/${competition_index}/user=${user_index}`)
             .then(({data}) => callback({data}))
             .catch(({response}) => onRejected(response)),
+    exportCSV: (competition_index, callback, onRejected) => 
+        loggingApi
+            .get(`/exportResult/${competition_index}`)
+            .then(({ data }) => callback({ data }))
+            .catch(({ response }) => onRejected(response)),      
 };
 
 export const command_api = {
