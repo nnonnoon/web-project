@@ -207,6 +207,27 @@ managerDomain.deleteUser = async(manager, user_index) => {
     }
 }
 
+managerDomain.findTagNumber = async(manager, tag_name) => {
+    try{
+        const map_tags = await manager.query(`
+            SELECT index, tag_name, tag_number
+            FROM "tags"
+            WHERE tag_name = '${tag_name}'
+        `);
+        return map_tags.rows[0];
+    }catch(err){
+        throw err;
+    }
+}
+
+managerDomain.delUserLogging = async(manager, tag_number, competition_index) => {
+    try{
+        await manager.query(`DELETE FROM "logging" WHERE tag_number = '${tag_number}' AND competition_index = '${competition_index}'`);
+    }catch(err){
+        throw err;
+    }
+}
+
 managerDomain.duplicateTag = async(manager, payload) => {
     try{
         const duplicate_tag  = await manager.query(`

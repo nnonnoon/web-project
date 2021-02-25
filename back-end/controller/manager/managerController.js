@@ -297,12 +297,18 @@ managerController.updateUser = async(req, res, next) => {
 }
 
 managerController.deleteUser = async(req, res, next) => {
-    const { user_index } = req.params; 
+    const { user_index } = req.params;
+    const {competition_index } = req.body; 
     const manager = await pool.connect();
 
     try{
         await manager.query("BEGIN");
+        let user_data = await managerDomain.fetchUser(manager, user_index);
+        let tag = await managerDomain.findTagNumber(manager, user_data.tag_name);
+
+        await managerDomain.delUserLogging(manager, tag.tag_number, competition_index);
         await managerDomain.deleteUser(manager, user_index);
+
         await manager.query("COMMIT");
         res.status(200).json({
             message: "Delete user success"
