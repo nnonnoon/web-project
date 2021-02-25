@@ -15,6 +15,7 @@ import results from '../../assets/icon/results.svg';
 import icon_detail from '../../assets/icon/icon_detail.svg';
 import gifrunning from '../../assets/icon/gifrunning.gif'
 import { subDomain } from '../../services/redirect'
+import NoResult from '../../assets/icon/NoResult.png'
 import Swal from 'sweetalert2'
 import { CSVLink } from "react-csv";
 
@@ -335,10 +336,10 @@ class user extends Component {
             ableGate: true,
             csvfile: undefined,
 
-            menu_users: true,
+            menu_users: false,
             menu_gates: false,
             menu_start: false,
-            menu_result: false,
+            menu_result: true,
 
             timerStarted: false,
             timerPause: true,
@@ -426,7 +427,7 @@ class user extends Component {
                     message.error(response.data.message);
                 }
             }
-        );
+        )
     }
 
 //---Change_Mode---//  
@@ -617,9 +618,14 @@ class user extends Component {
 
     handleDel(){
         let user_index = this.state.userIndex;
-        console.log(user_index)
+        let competition_index = window.location.pathname.split("/")[2];
+        const payload = {
+            competition_index: competition_index
+        };
+
         manager.deleteUser(
             user_index ,
+            payload,
             ({ data }) => {
                 console.log(data);
                 this.setState({ 
@@ -1228,8 +1234,10 @@ class user extends Component {
                                         <HeaderText  header >Delete</HeaderText>
                                     </ContainerTable>
                                     <ContainerItems>
-                                        {
-                                            this.state.user.map((user, index) => {
+                                        {  
+                                            this.state.user.length === 0 ? 
+                                                <div style={{paddingTop: "5%"}}><img src={NoResult} alt={NoResult}/></div>
+                                            : this.state.user.map((user, index) => {
                                                 return(
                                                     <ContainerAllItems>
                                                         <CompetitionStyled key={index+1}>
@@ -1435,7 +1443,7 @@ class user extends Component {
             <div style={{ width: "80%", height: "35rem", marginLeft: "25%"}}>
                 <MediaQuery minDeviceWidth={680}>
                     <ContainerOption >
-                        <div style={{fontSize: "3rem"}}>Competition</div>
+                        <div style={{fontSize: "3rem", paddingLeft: "36.5%"}}>Competition</div>
                     </ContainerOption>
 
                     {/* <div style={{display: "flex", alignItems: "center", justifyContent: "center" , width: "100%", height: "30%", marginBottom: "2rem"}}>
@@ -1499,7 +1507,9 @@ class user extends Component {
                     </ContainerTable>
                     <ContainerItems>
                         {
-                            this.state.results.map((results, index) => {
+                            this.state.results.length === 0 ? 
+                                <div style={{paddingTop: "5%"}}><img src={NoResult} alt={NoResult}/></div>
+                            : this.state.results.map((results, index) => {
                                 return(
                                     <ContainerAllItems>
                                         <CompetitionStyled key={index+1}>
@@ -1607,6 +1617,11 @@ class user extends Component {
                     <MenuOption competition_name marginBottom="1.75" fontSize="1.75rem"> 
                         {this.state.competition_name}
                     </MenuOption>
+
+                    <MenuOption menu_result={this.state.menu_result}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeResult}>
+                        <img src={results} alt={results} style={{marginRight: "5%"}}/> Results 
+                    </MenuOption>
+
                     <MenuOption menu_users={this.state.menu_users}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeUser}>
                             <img src={userImg} alt={userImg} style={{marginRight: "5%"}}/> Users
                     </MenuOption>
@@ -1618,16 +1633,14 @@ class user extends Component {
                     <MenuOption menu_start={this.state.menu_start} marginBottom="2" fontSize="1.25rem" onClick={this.changeModeStart}>
                         <img src={start} alt={start} style={{marginRight: "5%"}}/> Start 
                     </MenuOption>
-                    <MenuOption menu_result={this.state.menu_result}  marginBottom="2" fontSize="1.25rem" onClick={this.changeModeResult}>
-                        <img src={results} alt={results} style={{marginRight: "5%"}}/> Results 
-                    </MenuOption>
+
 
                     <p>{this.state.button_start}</p>
                     <p>{this.state.button_end}</p>
 
                 </ContainerMenu>
                     {
-                        this.state.menu_users ? this.isUserMode()   : this.state.menu_gates ? this.isGateMode() : this.state.menu_start ?  this.isStartMode() : this.isResultMode() 
+                        this.state.menu_result ? this.isResultMode()   : this.state.menu_users ? this.isUserMode() : this.state.menu_gates ?  this.isGateMode() : this.isStartMode()
                     }
             </ContainerLayout>
 

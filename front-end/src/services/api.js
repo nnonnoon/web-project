@@ -92,9 +92,9 @@ export const manager = {
             .get(`/fetchUser/${user_index}`)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
-    deleteUser:  (user_index, callback, onRejected) =>
+    deleteUser:  (user_index, payload, callback, onRejected) =>
         managerApi
-            .delete(`/deleteUser/${user_index}`)
+            .post(`/deleteUser/${user_index}`, payload)
             .then(({ data }) => callback({ data }))
             .catch(({ response }) => onRejected(response)),
     updateUser: (user_index, payload, callback, onRejected) =>
