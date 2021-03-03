@@ -17,6 +17,8 @@ tagsDomain.get = async(tags, SELECT, FROM, WHERE) => {
             str = str + " WHERE "+ `${WHERE[0]}`;
         }
 
+        str = str + " ORDER BY tag_name ASC"
+
         const all_tags = await tags.query(str);
         return all_tags.rows;
     }catch(err){
