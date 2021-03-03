@@ -168,9 +168,9 @@ class tags extends Component {
     }
 
     handleOk = () => {
-        this.setState({
-            loading: true
-        });
+        // this.setState({
+        //     loading: true
+        // });
         this.setState({
             loading: false, 
             visible: false 

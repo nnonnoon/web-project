@@ -299,7 +299,6 @@ const Export = styled.button`
 class user extends Component {
     formRef = React.createRef();
     
-
     constructor(props){
         super(props);
         this.fetchAllUser();
@@ -354,6 +353,7 @@ class user extends Component {
         }
         this.handleDel = this.handleDel.bind(this);
     }
+    
 
 //---Fetch_Competition---//
 
@@ -414,7 +414,7 @@ class user extends Component {
 //---Fetch_Result---//
     fetchResults() {
         let competition_index = window.location.pathname.split("/")[2];
-        results_api.fetchResult(
+        setInterval(() => results_api.fetchResult(
             competition_index,
             ({ data }) => {
                 console.log(data.results)
@@ -427,7 +427,7 @@ class user extends Component {
                     message.error(response.data.message);
                 }
             }
-        )
+        ), 1000)
     }
 
 //---Change_Mode---//  
