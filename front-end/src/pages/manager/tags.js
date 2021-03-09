@@ -240,7 +240,7 @@ class tags extends Component {
                         {
                             this.state.tags.map((tags, index) => {
                                 return(
-                                    <ListTags key={index} onClick={() => this.showModalDel(tags.index)}>{tags.tag_name}<br/> 
+                                    <ListTags key={index} >{tags.tag_name}<br/> 
                                         <TagNumber>No : {tags.tag_number}</TagNumber>
                                     </ListTags>
                                 )

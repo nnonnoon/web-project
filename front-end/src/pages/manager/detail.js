@@ -304,7 +304,7 @@ class user extends Component {
         this.fetchAllUser();
         this.fetchCompetition();
         this.fetchAllGate();
-        this.fetchResults();
+        this.newResults();
         this.exportCSV();
         let competition_index = window.location.pathname.split("/")[2]
 
@@ -411,6 +411,25 @@ class user extends Component {
         );
     }
 
+
+    newResults() {
+        let competition_index = window.location.pathname.split("/")[2];
+        results_api.fetchResult(
+            competition_index,
+            ({ data }) => {
+                console.log(data.results)
+                this.setState({
+                    results: data.results
+                });
+            },
+            (response) => {
+                if (response && response.status === 400) {
+                    message.error(response.data.message);
+                }
+            }
+        )
+    }
+
 //---Fetch_Result---//
     fetchResults() {
         let competition_index = window.location.pathname.split("/")[2];
@@ -427,7 +446,7 @@ class user extends Component {
                     message.error(response.data.message);
                 }
             }
-        ), 1000)
+        ), 20000)
     }
 
 //---Change_Mode---//  
