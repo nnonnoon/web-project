@@ -82,6 +82,8 @@ loggingDomain.get = async(logging, SELECT, FROM, WHERE) => {
             str = str + " WHERE "+ `${WHERE[0]}`;
         }
 
+        str = str + " ORDER BY index ASC"
+
         const all_tags = await logging.query(str);
         return all_tags.rows;
     }catch(err){

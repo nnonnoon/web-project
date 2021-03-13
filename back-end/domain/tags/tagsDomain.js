@@ -26,6 +26,7 @@ tagsDomain.get = async(tags, SELECT, FROM, WHERE) => {
     }
 }
 
+
 tagsDomain.post = async(tags, payload) => {
     try{
         var str = `INSERT INTO "tags" (tag_name, tag_number)
