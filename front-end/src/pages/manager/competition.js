@@ -148,7 +148,7 @@ class competition extends Component {
         this.fetchAllCompetition();
         this.state = {
             competitionName: "",
-            location: "Insee Chantarasatit Stadium",
+            location: "Seree Trairat",
             date: "",
             timeStart: "",
             timeEnd: "",
@@ -288,8 +288,8 @@ class competition extends Component {
         const dateFormat = 'DD/MM/YYYY';
         const menu = (
             <Menu onClick={this.handleMenuClick}>
-              <Menu.Item key="Insee Chantarasatit Stadium" >
-                Insee Chantarasatit Stadium
+              <Menu.Item key="Seree Trairat" >
+                Seree Trairat
               </Menu.Item>
               <Menu.Item key="Computer Engineering" >
                 Computer Engineering
