@@ -446,7 +446,7 @@ class user extends Component {
                     message.error(response.data.message);
                 }
             }
-        ), 5000)
+        ), 2000);
     }
 
 //---Change_Mode---//  
