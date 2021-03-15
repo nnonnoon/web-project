@@ -32,6 +32,11 @@ loggingController.fetchResult = async(req, res, next) => {
         for(var key in visitTag) {
             var obj = {};
             const user_detail = await loggingDomain.userDetail(logging, key, competition_index);
+            
+            if(user_detail === undefined){
+                continue
+            }
+
             obj["index"] = user_detail.index;
             obj["name_title"] = user_detail.name_title;
             obj["first_name"] = user_detail.first_name;
@@ -229,6 +234,13 @@ loggingController.exportResult = async(req, res, next) => {
         for(var key in visitTag) {
             var obj = {};
             const user_detail = await loggingDomain.userDetail(logging, key, competition_index);
+
+            // console.log(user_detail)
+
+            if(user_detail === undefined){
+                continue
+            }
+
             obj["index"] = user_detail.index;
             obj["name_title"] = user_detail.name_title;
             obj["first_name"] = user_detail.first_name;
