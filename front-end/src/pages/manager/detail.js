@@ -304,7 +304,7 @@ class user extends Component {
         this.fetchAllUser();
         this.fetchCompetition();
         this.fetchAllGate();
-        this.newResults();
+        this.fetchResults();
         this.exportCSV();
         let competition_index = window.location.pathname.split("/")[2]
 
@@ -446,7 +446,7 @@ class user extends Component {
                     message.error(response.data.message);
                 }
             }
-        ), 2000);
+        ), 1500);
     }
 
 //---Change_Mode---//  
