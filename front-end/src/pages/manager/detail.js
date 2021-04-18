@@ -417,7 +417,7 @@ class user extends Component {
         results_api.fetchResult(
             competition_index,
             ({ data }) => {
-                console.log(data.results)
+                // console.log(data.results)
                 this.setState({
                     results: data.results
                 });
@@ -436,7 +436,7 @@ class user extends Component {
         setInterval(() => results_api.fetchResult(
             competition_index,
             ({ data }) => {
-                console.log(data.results)
+                // console.log(data.results)
                 this.setState({
                     results: data.results
                 });
